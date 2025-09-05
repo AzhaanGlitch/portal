@@ -3,6 +3,7 @@ import { IsMobileProvider } from "../context/IsMobileContext";
 import { ScrollProvider } from "@/context/ScrollContext";
 import SmoothScroll from "@/context/SmoothScroll";
 import Header from "@/components/Navbar"
+import Footer from "@/components/Footer";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             <SmoothScroll>
               <Header />
               {children}
+              <Footer/>
             </SmoothScroll>
           </ScrollProvider>
         </IsMobileProvider>
