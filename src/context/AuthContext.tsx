@@ -10,6 +10,10 @@ interface User {
     email: string;
     first_name: string;
     last_name: string;
+    is_staff: boolean;
+    is_active: boolean;
+    is_superuser: boolean;
+    last_login: string | null;
     date_joined: string;
 }
 
@@ -31,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [user, setUser] = useState<User | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-
+    console.log("AuthProvider rendered. isAuthenticated:", isAuthenticated, "user:", user);
     /**
      * Fetches user data from the backend to verify authentication.
      * This function is the single source of truth for the user's auth status.
@@ -72,6 +76,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Assuming your backend has a '/accounts/logout/' endpoint
             // that invalidates the refresh token and clears the cookies.
             await api.post("/accounts/logout/");
+            
         } catch (error) {
             console.error("Logout failed:", error);
             // Even if the backend call fails, force a client-side logout
@@ -79,6 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } finally {
             setUser(null);
             setIsAuthenticated(false);
+            window.location.reload();
         }
     };
 
