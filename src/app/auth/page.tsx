@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useState, useEffect, useCallback, memo, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
 import styles from './auth.module.css';
 
 interface AuthData {
@@ -9,6 +10,8 @@ interface AuthData {
         name: string;
         email: string;
         password: string;
+        first_name: string;
+        last_name: string;
     };
     signIn: {
         email: string;
@@ -41,12 +44,9 @@ InputField.displayName = 'InputField';
 
 export default function AuthPage() {
     const router = useRouter();
-    const backendPrefix = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
-    console.log("Backend:", backendPrefix);
-
     const [isRightPanelActive, setIsRightPanelActive] = useState(false);
     const [authData, setAuthData] = useState<AuthData>({
-        signUp: { name: '', email: '', password: '' },
+        signUp: { name: '', email: '', password: '', first_name: '', last_name: '' },
         signIn: { email: '', password: '' },
     });
     const [error, setError] = useState('');
@@ -54,6 +54,7 @@ export default function AuthPage() {
 
     // Toggle between login and signup and update URL
     const togglePanel = (isSignUp: boolean) => {
+        console.log("Toggling panel. isSignUp:", isSignUp);
         setIsRightPanelActive(isSignUp);
         const action = isSignUp ? 'login' : 'signup';
         router.push(`/auth?action=${action}`);
@@ -68,12 +69,27 @@ export default function AuthPage() {
     }, []);
 
     // Handle input changes for both forms
-    const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>, type: 'signUp' | 'signIn') => {
-        setAuthData((prevData) => ({
-            ...prevData,
-            [type]: { ...prevData[type], [e.target.name]: e.target.value },
-        }));
-    }, []);
+    const handleInputChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>, type: "signUp" | "signIn") => {
+            const { name, value } = e.target;
+
+            setAuthData((prevData) => {
+                const updatedData = { ...prevData[type], [name]: value };
+
+                // If email is being updated in signUp, also set name = email
+                if (name === "email" && type === "signUp") {
+                    (updatedData as AuthData['signUp']).name = value;
+                }
+
+                return {
+                    ...prevData,
+                    [type]: updatedData,
+                };
+            });
+        },
+        []
+    );
+
 
     // Handle form submissions for both sign-up and sign-in using Axios
     const handleFormSubmit = useCallback(async (e: FormEvent, type: 'signUp' | 'signIn') => {
@@ -84,21 +100,18 @@ export default function AuthPage() {
         try {
             if (type === 'signUp') {
                 // Sign-up logic with Axios
-                const response = await axios.post('/api/auth/signup', authData.signUp, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
+                const response = await axios.post(`/accounts/signup/`, authData.signUp)
+                
+                console.log("Sign-up response:", response);
                 if (response.status === 200 || response.status === 201) {
                     // Sign in after successful sign-up
-                    const signInResponse = await axios.post('/api/auth/login', {
-                        email: authData.signUp.email,
-                        password: authData.signUp.password,
-                    });
+                    // const signInResponse = await axios.post(`${backendPrefix}/api/accounts/login`, {
+                    //     email: authData.signUp.email,
+                    //     password: authData.signUp.password,
+                    // });
 
-                    if (signInResponse.status === 200) {
-                        router.push('/home');
+                    if (true) {
+                        router.push('/');
                     } else {
                         setError('Sign-in after sign-up failed');
                     }
@@ -107,14 +120,11 @@ export default function AuthPage() {
                 }
             } else {
                 // Sign-in logic with Axios
-                const response = await axios.post('/api/auth/login', authData.signIn, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                const response = await api.post('/accounts/login/', authData.signIn);
 
                 if (response.status === 200) {
-                    router.push('/home');
+                    // setUser({ email: authData.signIn.email });
+                    router.push('/');
                 } else {
                     setError(response.data?.error || 'Sign-in failed');
                 }
@@ -147,28 +157,42 @@ export default function AuthPage() {
                             <span>or use your email for registration</span>
                             <InputField
                                 type="text"
-                                name="name"
-                                placeholder="Name"
+                                name="first name"
+                                placeholder="First Name"
                                 value={authData.signUp.name}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange(e, 'signUp')}
+                            />
+                            <InputField
+                                type="text"
+                                name="last name"
+                                placeholder="Last Name"
+                                value={authData.signUp.name}
+                                onChange={(e) => handleInputChange(e, 'signUp')}
                             />
                             <InputField
                                 type="email"
                                 name="email"
                                 placeholder="Email"
                                 value={authData.signUp.email}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange(e, 'signUp')}
                             />
                             <InputField
                                 type="password"
                                 name="password"
                                 placeholder="Password"
                                 value={authData.signUp.password}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange(e, 'signUp')}
                             />
                             <button type="submit" disabled={loading}>
                                 {loading ? 'Signing Up...' : 'Sign Up'}
                             </button>
+
+                            <div className={styles.changeTag}>
+                                <p>Already have an account?</p>
+                                <button className={styles.ghost} onClick={() => togglePanel(isRightPanelActive ? false : true)}>
+                                    Log In
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -183,19 +207,25 @@ export default function AuthPage() {
                                 name="email"
                                 placeholder="Email"
                                 value={authData.signIn.email}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange(e, 'signIn')}
                             />
                             <InputField
                                 type="password"
                                 name="password"
                                 placeholder="Password"
                                 value={authData.signIn.password}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleInputChange(e, 'signIn')}
                             />
                             <a href="#">Forgot your password?</a>
                             <button type="submit" disabled={loading}>
                                 {loading ? 'Signing In...' : 'Sign In'}
                             </button>
+                            <div className={styles.changeTag}>
+                                <p>Don't have an account?</p>
+                                <button className={styles.ghost} onClick={() => togglePanel(isRightPanelActive ? false : true)}>
+                                    Sign Up
+                                </button>
+                            </div>
                         </form>
                     </div>
 
