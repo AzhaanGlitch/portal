@@ -108,7 +108,7 @@ const Header = () => {
           <a href="#about" className="hover:text-gray-300">About</a>
           <a href="#services" className="hover:text-gray-300">Services</a>
           <a href="#contact" className="hover:text-gray-300">Contact</a>
-          {(user?.is_superuser || user?.is_staff) && <a href="/page/admin" className="hover:text-gray-300">Admin</a>}
+          {(user?.is_superuser || user?.is_staff) && <a href="/pages/admin" className="hover:text-gray-300">Admin</a>}
           <button onClick={logout} className="hover:text-gray-300">Logout</button>
         </nav>
       )}
