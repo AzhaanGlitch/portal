@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/context/IsMobileContext";
 import { useScroll } from "@/context/ScrollContext"; 
+import {useAuth} from "@/context/AuthContext";
 
 const Header = () => {
   const { isMobile } = useIsMobile();
@@ -11,7 +12,7 @@ const Header = () => {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
-
+  const { logout,user } = useAuth();
   // Use a local effect to track scroll direction for hiding/showing the header,
   // but only when the mobile menu is NOT open.
   useEffect(() => {
@@ -107,6 +108,8 @@ const Header = () => {
           <a href="#about" className="hover:text-gray-300">About</a>
           <a href="#services" className="hover:text-gray-300">Services</a>
           <a href="#contact" className="hover:text-gray-300">Contact</a>
+          {(user?.is_superuser || user?.is_staff) && <a href="/page/admin" className="hover:text-gray-300">Admin</a>}
+          <button onClick={logout} className="hover:text-gray-300">Logout</button>
         </nav>
       )}
 
@@ -124,6 +127,7 @@ const Header = () => {
             <a href="#about" onClick={handleLinkClick} className="hover:text-gray-300">About</a>
             <a href="#services" onClick={handleLinkClick} className="hover:text-gray-300">Services</a>
             <a href="#contact" onClick={handleLinkClick} className="hover:text-gray-300">Contact</a>
+            <button onClick={() => { handleLinkClick(); logout(); }} className="hover:text-gray-300">Logout</button>
           </motion.nav>
         )}
       </AnimatePresence>
