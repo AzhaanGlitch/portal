@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { IsMobileProvider } from "../context/IsMobileContext";
-import { ScrollProvider } from "@/context/ScrollContext";
-import SmoothScroll from "@/context/SmoothScroll";
-import Header from "@/components/Navbar"
-import Footer from "@/components/Footer";
+// import { ScrollProvider } from "@/context/ScrollContext";
+// import SmoothScroll from "@/context/SmoothScroll";
+// import Header from "@/components/Navbar"
+// import Footer from "@/components/Footer";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -33,13 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <IsMobileProvider>
-          <ScrollProvider>
+          {/* <ScrollProvider>
             <SmoothScroll>
-              <Header />
+              <Header /> */}
               {children}
-              <Footer/>
+              {/* <Footer/>
             </SmoothScroll>
-          </ScrollProvider>
+          </ScrollProvider> */}
         </IsMobileProvider>
       </body>
     </html>
