@@ -5,7 +5,10 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./hero.module.css";
 import GradientBlinds from "../animations/GradientBlinds/GradientBlinds";
 import BlurText from "../animations/BlurText/BlurText";
-import LiquidEther from "../animations/LiquidEther/LiquidEther";
+import ServicesSection from "./ServicesSection";
+import PrototypesSection from "./PrototypesSection";
+import TeamSection from "./TeamSection";
+import BackgroundAnimation from "../animations/BackgroundAnimation/BackgroundAnimation";
 
 export default function HomePage() {
   const [currentSection, setCurrentSection] = useState(0);
@@ -87,14 +90,17 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      <Hero />
+      <BackgroundAnimation/>
+      <HeroSection />
       <NextSection />
-      <SectionIndicator currentSection={currentSection} totalSections={2} />
+      <ServicesSection />
+      <PrototypesSection />
+      <TeamSection />
     </div>
   );
 }
 
-export const Hero = () => {
+export const HeroSection = () => {
   return (
     <section className="relative w-full h-screen overflow-hidden">
       <GradientBlinds
@@ -214,6 +220,7 @@ export const Hero = () => {
   );
 };
 
+
 const NextSection = () => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -229,401 +236,61 @@ const NextSection = () => {
   };
 
   return (
-    <>
-      {/* Hero Section with LiquidEther */}
-      <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        {/* LiquidEther as background */}
-        <div className="absolute inset-0 z-0">
-          <LiquidEther
-            colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        </div>
+    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+      {/* Content */}
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        <BlurText
+          text="Fueling Innovation, Driving Growth."
+          delay={250}
+          animateBy="words"
+          direction="top"
+          onAnimationComplete={handleAnimationComplete}
+          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+        />
 
-        {/* Dark overlay for better text contrast */}
-        <div className="absolute inset-0 bg-black/30 z-1"></div>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-xl md:text-2xl text-slate-300 mb-10 max-w-3xl mx-auto font-light tracking-wide"
+        >
+          Transforming industries with cutting-edge <span className="text-cyan-400 font-medium">robotics</span>, 
+          <span className="text-blue-400 font-medium"> IoT solutions</span>, and visionary technology
+        </motion.p>
 
-        {/* Content */}
-        <div className="relative z-2 text-center px-4 max-w-4xl mx-auto">
-          <BlurText
-            text="Fueling Innovation, Driving Growth."
-            delay={250}
-            animateBy="words"
-            direction="top"
-            onAnimationComplete={handleAnimationComplete}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 font-serif"
-          />
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-slate-200 mb-10 max-w-3xl mx-auto font-light"
-          >
-            Transforming industries with cutting-edge technology and visionary
-            solutions
-          </motion.p>
-
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.9 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
           <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isVisible ? 1 : 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="px-8 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg border border-white/20 hover:bg-white/20 transition-colors duration-300 font-medium"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-medium 
+                     shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 
+                     border border-cyan-400/30 flex items-center gap-2"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
             Explore Our Work
           </motion.button>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isVisible ? 1 : 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white flex flex-col items-center z-2"
-        >
-          <span className="text-sm mb-2">Scroll down</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 bg-transparent text-white rounded-lg font-medium border border-cyan-500/30 
+                     hover:bg-cyan-500/10 transition-all duration-300 flex items-center gap-2"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-          </motion.div>
+            Learn More
+          </motion.button>
         </motion.div>
-      </section>
-
-      {/* Services Section with same LiquidEther background */}
-      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Same LiquidEther background */}
-        <div className="absolute inset-0 z-0">
-          <LiquidEther
-            colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        </div>
-
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/40 z-1"></div>
-
-        {/* Services Content */}
-        <div className="relative z-2 text-center px-4 max-w-6xl mx-auto py-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-16 font-serif"
-          >
-            Services We Provide
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 hover:bg-white/15 transition-colors duration-300"
-              >
-                <div className="text-4xl mb-4 text-white">{service.icon}</div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-slate-200 mb-4">{service.description}</p>
-                <button className="px-4 py-2 bg-white/20 text-white rounded-lg text-sm hover:bg-white/30 transition-colors duration-300">
-                  Read More
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Prototypes Section with same LiquidEther background */}
-      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Same LiquidEther background */}
-        <div className="absolute inset-0 z-0">
-          <LiquidEther
-            colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        </div>
-
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/40 z-1"></div>
-
-        {/* Prototypes Content */}
-        <div className="relative z-2 text-center px-4 max-w-6xl mx-auto py-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-16 font-serif"
-          >
-            Prototypes We've Built
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {prototypes.map((prototype, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 overflow-hidden group"
-              >
-                <div className="h-48 mb-4 overflow-hidden rounded-lg">
-                  <img
-                    src={prototype.image}
-                    alt={prototype.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  {prototype.title}
-                </h3>
-                <p className="text-slate-200 mb-4">{prototype.description}</p>
-                <button className="px-4 py-2 bg-white/20 text-white rounded-lg text-sm hover:bg-white/30 transition-colors duration-300">
-                  Read More
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section with same LiquidEther background */}
-      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Same LiquidEther background */}
-        <div className="absolute inset-0 z-0">
-          <LiquidEther
-            colors={["#5227FF", "#FF9FFC", "#B19EEF"]}
-            mouseForce={20}
-            cursorSize={100}
-            isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
-            isBounce={false}
-            autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
-            takeoverDuration={0.25}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-          />
-        </div>
-
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/40 z-1"></div>
-
-        {/* Team Content */}
-        <div className="relative z-2 text-center px-4 max-w-6xl mx-auto py-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-16 font-serif"
-          >
-            People Working With I2EDC
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 text-center group"
-              >
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-white/30">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-1">
-                  {member.name}
-                </h3>
-                <p className="text-slate-300 text-sm mb-3">{member.role}</p>
-                <p className="text-slate-200 text-xs mb-4">{member.bio}</p>
-                <button className="px-4 py-2 bg-white/20 text-white rounded-lg text-sm hover:bg-white/30 transition-colors duration-300">
-                  Read More
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
-// Sample data for services, prototypes, and team
-const services = [
-  {
-    icon: "🚀",
-    title: "Technology Innovation",
-    description: "Cutting-edge solutions for modern challenges",
-  },
-  {
-    icon: "🔬",
-    title: "Research & Development",
-    description: "Transforming ideas into tangible products",
-  },
-  {
-    icon: "💡",
-    title: "Consulting Services",
-    description: "Expert guidance for your technology needs",
-  },
-  {
-    icon: "🛠️",
-    title: "Prototype Development",
-    description: "From concept to functional prototype",
-  },
-  {
-    icon: "📊",
-    title: "Data Analytics",
-    description: "Turning data into actionable insights",
-  },
-  {
-    icon: "🤖",
-    title: "AI Solutions",
-    description: "Intelligent systems for complex problems",
-  },
-];
-
-const prototypes = [
-  {
-    image:
-      "https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-    title: "Automated Testing System",
-    description: "Revolutionary system for automated quality assurance",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-    title: "Energy Monitoring Device",
-    description: "Real-time energy consumption tracking solution",
-  },
-];
-
-const team = [
-  {
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    name: "John Smith",
-    role: "Lead Engineer",
-    bio: "10+ years of experience in tech innovation",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    name: "Sarah Johnson",
-    role: "Research Director",
-    bio: "PhD in Computer Science with multiple publications",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    name: "Michael Chen",
-    role: "Product Designer",
-    bio: "Specialized in human-centered design approaches",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1614289371518-722f2615943d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-    name: "Emily Rodriguez",
-    role: "Data Scientist",
-    bio: "Expert in machine learning and predictive analytics",
-  },
-];
-
-const SectionIndicator = ({
-  currentSection,
-  totalSections,
-}: {
-  currentSection: number;
-  totalSections: number;
-}) => {
-  return (
-    <div className="hidden md:flex fixed right-6 top-1/2 transform -translate-y-1/2 z-50 flex-col gap-3">
-      {Array.from({ length: totalSections }).map((_, index) => (
-        <button
-          key={index}
-          onClick={() => {
-            setTimeout(() => {
-              window.scrollTo({
-                top: document.querySelectorAll("section")[index].offsetTop,
-                behavior: "smooth",
-              });
-            }, 50);
-          }}
-          className={`w-3 h-3 rounded-full transition-all ${
-            index === currentSection ? "bg-white scale-125" : "bg-white/30"
-          }`}
-          aria-label={`Go to section ${index + 1}`}
-        />
-      ))}
-    </div>
-  );
-};
