@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="font-sans">
       <HeroPage/>
-      <MissionSection/>
+      {/* <MissionSection/> */}
     </main>
   );
 }
