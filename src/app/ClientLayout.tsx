@@ -30,7 +30,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <PreWrapper>
                 <Header />
                 {children}
-                <Footer />
+                {/* <Footer /> */}
             </PreWrapper>
         </AuthProvider>
     );
