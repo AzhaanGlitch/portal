@@ -12,7 +12,7 @@ const Header = () => {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  const { logout,user } = useAuth();
+  const { logout,user,isAuthenticated } = useAuth();
   // Use a local effect to track scroll direction for hiding/showing the header,
   // but only when the mobile menu is NOT open.
   useEffect(() => {
@@ -104,12 +104,12 @@ const Header = () => {
       {/* Navigation Links (Desktop) */}
       {!isMobile && (
         <nav className="flex space-x-6 text-white">
-          <a href="#home" className="hover:text-gray-300">Home</a>
-          <a href="#about" className="hover:text-gray-300">About</a>
-          <a href="#services" className="hover:text-gray-300">Services</a>
-          <a href="#contact" className="hover:text-gray-300">Contact</a>
+          <a href={isAuthenticated?"/pages/home":"/"} className="hover:text-gray-300">Home</a>
+          <a href="/pages/about" className="hover:text-gray-300">About</a>
+          <a href="/pages/services" className="hover:text-gray-300">Services</a>
+          <a href="/pages/contact" className="hover:text-gray-300">Contact</a>
           {(user?.is_superuser || user?.is_staff) && <a href="/pages/admin" className="hover:text-gray-300">Admin</a>}
-          <button onClick={logout} className="hover:text-gray-300">Logout</button>
+          {isAuthenticated && <button onClick={logout} className="hover:text-gray-300">Logout</button>}
         </nav>
       )}
 
@@ -123,7 +123,7 @@ const Header = () => {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="flex flex-col items-center justify-center space-y-8 text-white text-3xl w-full flex-grow p-4"
           >
-            <a href="#home" onClick={handleLinkClick} className="hover:text-gray-300">Home</a>
+            <a href={isAuthenticated?"/pages/home":"/"} onClick={handleLinkClick} className="hover:text-gray-300">Home</a>
             <a href="#about" onClick={handleLinkClick} className="hover:text-gray-300">About</a>
             <a href="#services" onClick={handleLinkClick} className="hover:text-gray-300">Services</a>
             <a href="#contact" onClick={handleLinkClick} className="hover:text-gray-300">Contact</a>
