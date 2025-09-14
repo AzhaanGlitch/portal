@@ -34,7 +34,7 @@ const InputField = memo(({ type, name, placeholder, value, onChange }: InputFiel
         name={name}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e, type === 'password' && name === 'password' ? 'signIn' : 'signUp')}
+        onChange={(e) => onChange(e, name.includes('password') ? 'signIn' : 'signUp')}
         required
         className={styles.input}
     />
@@ -49,6 +49,7 @@ export default function AuthPage() {
         signUp: { name: '', email: '', password: '', first_name: '', last_name: '' },
         signIn: { email: '', password: '' },
     });
+    
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -76,10 +77,11 @@ export default function AuthPage() {
             setAuthData((prevData) => {
                 const updatedData = { ...prevData[type], [name]: value };
 
-                // If email is being updated in signUp, also set name = email
-                if (name === "email" && type === "signUp") {
-                    (updatedData as AuthData['signUp']).name = value;
-                }
+                // Remove the automatic name = email assignment
+                // Only set name = email if you specifically want that behavior
+                // if (name === "email" && type === "signUp") {
+                //     (updatedData as AuthData['signUp']).name = value;
+                // }
 
                 return {
                     ...prevData,
@@ -89,7 +91,6 @@ export default function AuthPage() {
         },
         []
     );
-
 
     // Handle form submissions for both sign-up and sign-in using Axios
     const handleFormSubmit = useCallback(async (e: FormEvent, type: 'signUp' | 'signIn') => {
@@ -129,7 +130,7 @@ export default function AuthPage() {
                     setError(response.data?.error || 'Sign-in failed');
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 setError(error.response?.data?.error || `Something went wrong during ${type === 'signUp' ? 'sign-up' : 'sign-in'}.`);
             } else {
@@ -157,16 +158,16 @@ export default function AuthPage() {
                             <span>or use your email for registration</span>
                             <InputField
                                 type="text"
-                                name="first name"
+                                name="first_name"
                                 placeholder="First Name"
-                                value={authData.signUp.name}
+                                value={authData.signUp.first_name}
                                 onChange={(e) => handleInputChange(e, 'signUp')}
                             />
                             <InputField
                                 type="text"
-                                name="last name"
+                                name="last_name"
                                 placeholder="Last Name"
-                                value={authData.signUp.name}
+                                value={authData.signUp.last_name}
                                 onChange={(e) => handleInputChange(e, 'signUp')}
                             />
                             <InputField
@@ -221,7 +222,7 @@ export default function AuthPage() {
                                 {loading ? 'Signing In...' : 'Sign In'}
                             </button>
                             <div className={styles.changeTag}>
-                                <p>Don't have an account?</p>
+                                <p>Don&lsquo;t have an account?</p>
                                 <button className={styles.ghost} onClick={() => togglePanel(isRightPanelActive ? false : true)}>
                                     Sign Up
                                 </button>
@@ -236,7 +237,7 @@ export default function AuthPage() {
                                 <h1>Welcome Back!</h1>
                                 <p>To keep connected with us please login with your personal info</p>
                                 <div className={styles.chng}>
-                                    <p>Click the button below to sign up if you don't have an account yet.</p>
+                                    <p>Click the button below to sign up if you don&lsquo;t have an account yet.</p>
                                     <button className={styles.ghost} onClick={() => togglePanel(false)}>
                                         Sign Up
                                     </button>
