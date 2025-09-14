@@ -103,7 +103,7 @@ function OTPPage() {
       if (response.status === 200) {
         setSuccess("OTP verified successfully! Redirecting...");
         setTimeout(() => {
-          router.push("/home");
+          router.push("/auth");
         }, 2000);
       }
     } catch (error: unknown) {
