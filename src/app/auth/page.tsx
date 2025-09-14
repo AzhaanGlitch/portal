@@ -100,23 +100,19 @@ export default function AuthPage() {
 
         try {
             if (type === 'signUp') {
-                // Sign-up logic with Axios
+                // Sign-up logic with api
                 const response = await api.post(`/accounts/signup/`, authData.signUp)
+                console.log("otp", response.data.otp);
+                localStorage.setItem('i2dcUsername@#12', response.data?.username || " ");
                 
-                console.log("Sign-up response:", response);
                 if (response.status === 200 || response.status === 201) {
-                    // Sign in after successful sign-up
-                    // const signInResponse = await axios.post(`${backendPrefix}/api/accounts/login`, {
-                    //     email: authData.signUp.email,
-                    //     password: authData.signUp.password,
-                    // });
+                    router.push('/auth/verify-otp');
+                    // if (true) {
+                    //     window.alert("Your account has been created successfully. Please log in.");
 
-                    if (true) {
-                        window.alert("Your account has been created successfully. Please log in.");
-
-                    } else {
-                        setError('Sign-in after sign-up failed');
-                    }
+                    // } else {
+                    //     setError('Sign-in after sign-up failed');
+                    // }
                     authData.signUp.first_name = '';
                     authData.signUp.last_name = '';
                     authData.signUp.email = '';
