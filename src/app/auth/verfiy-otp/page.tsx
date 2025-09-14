@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import api from "@/lib/api";
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import "./OTPPage.css";
@@ -84,6 +84,8 @@ function OTPPage() {
   const handleSubmit = async (otpValue?: string) => {
     const otpCode = otpValue || otp.join("");
 
+    const username = localStorage.getItem("i2dcUsername@#12");
+
     if (otpCode.length !== 6) {
       setError("Please enter a valid 6-digit OTP");
       return;
@@ -93,18 +95,10 @@ function OTPPage() {
     setError("");
 
     try {
-      const response = await axios.post(
-        "/api/auth/verify-otp",
-        {
-          email,
-          otp: otpCode,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.post("/accounts/verify-otp/", {
+        username,
+        otp: otpCode,
+      });
 
       if (response.status === 200) {
         setSuccess("OTP verified successfully! Redirecting...");
@@ -113,11 +107,9 @@ function OTPPage() {
         }, 2000);
       }
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.error || "OTP verification failed");
-      } else {
-        setError("OTP verification failed");
-      }
+
+      setError("OTP verification failed");
+
     } finally {
       setLoading(false);
     }
@@ -127,19 +119,13 @@ function OTPPage() {
   const handleResendOTP = async () => {
     setLoading(true);
     setError("");
-
+    const username = localStorage.getItem("i2dcUsername@#12");
     try {
-      const response = await axios.post(
-        "/api/auth/resend-otp",
-        {
-          email,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await api.post(
+        "/accounts/resend-signup-otp/",
+        {username}
       );
+      console.log("Resend OTP response:", response.data.otp);
 
       if (response.status === 200) {
         setSuccess("New OTP sent to your email");
@@ -151,11 +137,9 @@ function OTPPage() {
         inputRefs.current[0]?.focus();
       }
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.error || "Failed to resend OTP");
-      } else {
-        setError("Failed to resend OTP");
-      }
+
+      setError("Failed to resend OTP");
+
     } finally {
       setLoading(false);
     }
