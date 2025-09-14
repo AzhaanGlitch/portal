@@ -12,7 +12,7 @@ const Header = () => {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  const { logout,user } = useAuth();
+  const { logout,user,isAuthenticated } = useAuth();
   // Use a local effect to track scroll direction for hiding/showing the header,
   // but only when the mobile menu is NOT open.
   useEffect(() => {
@@ -109,7 +109,7 @@ const Header = () => {
           <a href="/pages/services" className="hover:text-gray-300">Services</a>
           <a href="/pages/contact" className="hover:text-gray-300">Contact</a>
           {(user?.is_superuser || user?.is_staff) && <a href="/pages/admin" className="hover:text-gray-300">Admin</a>}
-          <button onClick={logout} className="hover:text-gray-300">Logout</button>
+          {isAuthenticated && <button onClick={logout} className="hover:text-gray-300">Logout</button>}
         </nav>
       )}
 
@@ -128,6 +128,7 @@ const Header = () => {
             <a href="/pages/services" onClick={handleLinkClick} className="hover:text-gray-300">Services</a>
             <a href="/pages/contact" onClick={handleLinkClick} className="hover:text-gray-300">Contact</a>
              {(user?.is_superuser || user?.is_staff) && <a href="/pages/admin" className="hover:text-gray-300">Admin</a>}
+
             <button onClick={() => { handleLinkClick(); logout(); }} className="hover:text-gray-300">Logout</button>
           </motion.nav>
         )}
