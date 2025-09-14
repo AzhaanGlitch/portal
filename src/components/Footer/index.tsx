@@ -14,9 +14,9 @@ export default function Footer() {
           transition={{ duration: 0.6 }}
           className="text-center md:text-left"
         >
-          <h2 className="text-xl font-bold text-white">Portal</h2>
+          <h2 className="text-xl font-bold text-white">I2EDC</h2>
           <p className="text-sm text-gray-400">
-            Trans-orbital freedom. Mission-ready capability.
+            Fueling Innovation, Driving Growth.
           </p>
         </motion.div>
 
@@ -72,7 +72,7 @@ export default function Footer() {
 
       {/* Bottom copyright */}
       <div className="mt-8 border-t border-gray-700 pt-6 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} Supernova. All rights reserved.
+        © {new Date().getFullYear()} I2EDC. All rights reserved.
       </div>
     </footer>
   );

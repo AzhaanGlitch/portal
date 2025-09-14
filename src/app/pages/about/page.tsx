@@ -1,11 +1,8 @@
-'use client';
-import HeroPage from "@/components/Hero";
-
+import AboutPage from "@/components/About";
 export default function Home() {
   return (
     <main className="font-sans">
-     
-      <HeroPage />
+      <AboutPage />
     </main>
   );
 }

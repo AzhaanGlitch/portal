@@ -1,0 +1,166 @@
+.hero-content {
+    z-index: 20;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 5rem;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-left: 5rem;
+    padding-right: 5rem;
+    box-sizing: border-box;
+    /* gap: 2rem;  */
+}
+
+.card {
+    grid-column-gap: 1.25rem;
+    grid-row-gap: 1.25rem;
+    padding: .5rem; /* Increased padding for better touch targets */
+    background-color: #f0f0f0;
+    color: black;
+    justify-content: space-between;
+    align-items: stretch;
+    transition: color .3s, transform .4s;
+    display: flex;
+    position: relative;
+    flex: 1; /* Added flex property for equal distribution */
+    min-width: 0; /* Prevents flex items from overflowing */
+    font-size: clamp(.3rem, 3vw, 1rem);
+}
+
+.card-content {
+    flex-flow: column;
+    justify-content: center;
+    align-items: stretch;
+    max-width: 17.375rem;
+    display: flex;
+    width: 100%; /* Ensure full width */
+}
+
+.card-image {
+    aspect-ratio: 97 / 120;
+    object-fit: cover;
+    max-width: 6rem;
+    max-height: 7.5rem;
+    width: 100%; /* Responsive image */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.card-overlay {
+    z-index: -1;
+    background-color: #282828;
+    pointer-events: none;
+    height: 0%;
+    transition: height .3s;
+    position: absolute;
+    inset: auto 0% 0%;
+}
+.text-responsive-heading-1{
+    font-size: clamp(1.5rem, 5vw, 3rem);
+}
+
+/* Large desktop devices (1440px and above) */
+@media (min-width: 1440px) {
+    .hero-content {
+        max-width: 1400px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* Desktop devices (1024px - 1439px) */
+@media (max-width: 1439px) {
+    .hero-content {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+/* Tablet devices (768px - 1023px) */
+@media (max-width: 1023px) {
+    .hero-content {
+        flex-direction: column;
+        align-items: center;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-bottom: 3rem;
+        gap: 1.5rem;
+    }
+    .card{
+        width: 100%;
+    }
+    
+    
+}
+
+/* Large mobile devices (481px - 767px) */
+@media (max-width: 767px) {
+    .hero-content {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-bottom: 2rem;
+        gap: 1.25rem;
+    }
+    
+    
+}
+
+/* Mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+    .hero-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 1.5rem;
+        gap: 1rem;
+    }
+    
+    .card {
+        width: 100%;
+    }
+    
+}
+
+/* Extra small devices (320px and below) */
+@media (max-width: 320px) {
+    .hero-content {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        padding-bottom: 1rem;
+    }
+    
+    /* .card {
+        padding: 0.75rem;
+    }
+    
+    .card-image {
+        max-width: 4rem;
+        max-height: 5rem;
+    } */
+}
+
+/* High DPI/Retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .card-image {
+        /* Ensure images are crisp on high DPI screens */
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Orientation specific styles */
+@media (max-width: 1023px) and (orientation: landscape) {
+    .hero-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .card {
+        flex: 0 0 calc(50% - 1rem);
+        min-width: 200px;
+    }
+}
