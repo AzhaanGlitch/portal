@@ -53,10 +53,13 @@ const ServicesPage: React.FC = () => {
                     midtoneColor: 0x5a6f,
                     baseColor: 0x1a3342,
                     blurFactor: 0.49,
-                    speed: 1.80,
-                    zIndex: -1 // Ensure background stays behind content
+                    speed: 1.80
                 })
             );
+        }
+        // Resize the Vanta effect to match the container size initially
+        if (vantaRef.current && vantaEffect && typeof vantaEffect.resize === 'function') {
+            vantaEffect.resize();
         }
         return () => {
             if (vantaEffect) vantaEffect.destroy();
@@ -141,7 +144,7 @@ const ServicesPage: React.FC = () => {
 
     return (
         <div className="relative min-h-screen bg-gray-900">
-            <div ref={vantaRef} className="absolute inset-0 z-0" />
+            <div ref={vantaRef} className="absolute inset-0 z-0 w-full h-full" />
             <div className="container mx-auto px-10 py-8 relative z-10 min-h-screen">
                 <br />
 
