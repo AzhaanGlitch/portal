@@ -38,30 +38,35 @@ const ServicesPage: React.FC = () => {
     const [vantaEffect, setVantaEffect] = useState<any>(null);
     const vantaRef = useRef<HTMLDivElement>(null);
 
-    // useEffect(() => {
-    //     if (!vantaEffect && vantaRef.current) {
-    //         setVantaEffect(
-    //             FOG({
-    //                 el: vantaRef.current,
-    //                 THREE: THREE,
-    //                 mouseControls: true,
-    //                 touchControls: true,
-    //                 gyroControls: false,
-    //                 minHeight: 200.00,
-    //                 minWidth: 200.00,
-    //                 highlightColor: 0x345c86,
-    //                 midtoneColor: 0x5a6f,
-    //                 baseColor: 0x1a3342,
-    //                 blurFactor: 0.49,
-    //                 speed: 1.80,
-    //                 zIndex: -1 // Ensure background stays behind content
-    //             })
-    //         );
-    //     }
-    //     return () => {
-    //         if (vantaEffect) vantaEffect.destroy();
-    //     };
-    // }, [vantaEffect]);
+
+//     useEffect(() => {
+//         if (!vantaEffect && vantaRef.current) {
+//             setVantaEffect(
+//                 FOG({
+//                     el: vantaRef.current,
+//                     THREE: THREE,
+//                     mouseControls: true,
+//                     touchControls: true,
+//                     gyroControls: false,
+//                     minHeight: 200.00,
+//                     minWidth: 200.00,
+//                     highlightColor: 0x345c86,
+//                     midtoneColor: 0x5a6f,
+//                     baseColor: 0x1a3342,
+//                     blurFactor: 0.49,
+//                     speed: 1.80
+//                 })
+//             );
+//         }
+  
+//         // Resize the Vanta effect to match the container size initially
+//         if (vantaRef.current && vantaEffect && typeof vantaEffect.resize === 'function') {
+//             vantaEffect.resize();
+//         }
+//         return () => {
+//             if (vantaEffect) vantaEffect.destroy();
+//         };
+//     }, [vantaEffect]);
 
     useEffect(() => {
         fetchServices();
@@ -141,7 +146,7 @@ const ServicesPage: React.FC = () => {
 
     return (
         <div className="relative min-h-screen bg-gray-900">
-            <div ref={vantaRef} className="absolute inset-0 z-0" />
+            <div ref={vantaRef} className="absolute inset-0 z-0 w-full h-full" />
             <div className="container mx-auto px-10 py-8 relative z-10 min-h-screen">
                 <br />
 

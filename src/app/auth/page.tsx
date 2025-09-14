@@ -7,7 +7,7 @@ import styles from './auth.module.css';
 
 interface AuthData {
     signUp: {
-        name: string;
+        username: string;
         email: string;
         password: string;
         first_name: string;
@@ -46,7 +46,7 @@ export default function AuthPage() {
     const router = useRouter();
     const [isRightPanelActive, setIsRightPanelActive] = useState(false);
     const [authData, setAuthData] = useState<AuthData>({
-        signUp: { name: '', email: '', password: '', first_name: '', last_name: '' },
+        signUp: { username: '', email: '', password: '', first_name: '', last_name: '' },
         signIn: { email: '', password: '' },
     });
     
@@ -79,9 +79,9 @@ export default function AuthPage() {
 
                 // Remove the automatic name = email assignment
                 // Only set name = email if you specifically want that behavior
-                // if (name === "email" && type === "signUp") {
-                //     (updatedData as AuthData['signUp']).name = value;
-                // }
+                if (name === "email" && type === "signUp") {
+                    (updatedData as AuthData['signUp']).username = value;
+                }
 
                 return {
                     ...prevData,
@@ -100,22 +100,26 @@ export default function AuthPage() {
 
         try {
             if (type === 'signUp') {
-                // Sign-up logic with Axios
-                const response = await axios.post(`/accounts/signup/`, authData.signUp)
+                // Sign-up logic with api
+                const response = await api.post(`/accounts/signup/`, authData.signUp)
+                console.log("otp", response.data.otp);
+                localStorage.setItem('i2dcUsername@#12', response.data?.username || " ");
                 
-                console.log("Sign-up response:", response);
                 if (response.status === 200 || response.status === 201) {
-                    // Sign in after successful sign-up
-                    // const signInResponse = await axios.post(`${backendPrefix}/api/accounts/login`, {
-                    //     email: authData.signUp.email,
-                    //     password: authData.signUp.password,
-                    // });
+                    router.push('/auth/verify-otp');
+                    // if (true) {
+                    //     window.alert("Your account has been created successfully. Please log in.");
 
-                    if (true) {
-                        router.push('/');
-                    } else {
-                        setError('Sign-in after sign-up failed');
-                    }
+                    // } else {
+                    //     setError('Sign-in after sign-up failed');
+                    // }
+                    authData.signUp.first_name = '';
+                    authData.signUp.last_name = '';
+                    authData.signUp.email = '';
+                    authData.signUp.password = '';
+                    authData.signUp.username = '';
+                    setIsRightPanelActive(true);
+                    router.push('/auth?action=login');
                 } else {
                     setError(response.data?.error || 'Sign-up failed');
                 }
