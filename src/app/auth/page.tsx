@@ -129,7 +129,7 @@ export default function AuthPage() {
                     setError(response.data?.error || 'Sign-in failed');
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 setError(error.response?.data?.error || `Something went wrong during ${type === 'signUp' ? 'sign-up' : 'sign-in'}.`);
             } else {
@@ -221,7 +221,7 @@ export default function AuthPage() {
                                 {loading ? 'Signing In...' : 'Sign In'}
                             </button>
                             <div className={styles.changeTag}>
-                                <p>Don't have an account?</p>
+                                <p>Don&lsquo;t have an account?</p>
                                 <button className={styles.ghost} onClick={() => togglePanel(isRightPanelActive ? false : true)}>
                                     Sign Up
                                 </button>
@@ -236,7 +236,7 @@ export default function AuthPage() {
                                 <h1>Welcome Back!</h1>
                                 <p>To keep connected with us please login with your personal info</p>
                                 <div className={styles.chng}>
-                                    <p>Click the button below to sign up if you don't have an account yet.</p>
+                                    <p>Click the button below to sign up if you don&lsquo;t have an account yet.</p>
                                     <button className={styles.ghost} onClick={() => togglePanel(false)}>
                                         Sign Up
                                     </button>

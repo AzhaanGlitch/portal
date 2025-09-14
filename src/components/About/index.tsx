@@ -1,7 +1,6 @@
 // about.jsx
 "use client";
 import { motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
 import BackgroundAnimation from "../animations/BackgroundAnimation/BackgroundAnimation";
 import GradientBlinds from "../animations/GradientBlinds/GradientBlinds";
 import styles from "./about.module.css";
@@ -134,7 +133,7 @@ const MissionSection = () => {
           className="text-xl text-slate-300 mb-12 leading-relaxed text-center"
         >
           <p className="mb-6">
-            At Portal Space Systems, we're revolutionizing space mobility with
+            At Portal Space Systems, we&lsquo;re revolutionizing space mobility with
             innovative propulsion technologies that enable satellites to
             maneuver with unprecedented agility and efficiency.
           </p>

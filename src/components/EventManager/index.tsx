@@ -179,21 +179,6 @@ const EventManager = () => {
         }
     };
 
-    const handleAddParticipant = async () => {
-        if (!selectedEventId || !participantId) return;
-        try {
-            await api.post(`/events/${selectedEventId}/add-participant/`, {
-                user_id: participantId,
-            });
-            alert("Participant added successfully!");
-            setParticipantId("");
-            fetchEvents();
-        } catch (error) {
-            console.error("Error adding participant:", error);
-            alert("Failed to add participant.");
-        }
-    };
-
     return (
         <div className="p-6 space-y-6 text-white">
             <Card className="max-w-md ">
