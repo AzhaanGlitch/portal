@@ -1,5 +1,7 @@
 // Hero.tsx
+
 "use client";
+
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import styles from "./hero.module.css";
@@ -9,6 +11,35 @@ import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
 import BackgroundAnimation from "../animations/BackgroundAnimation/BackgroundAnimation";
+
+// News data for the carousel
+const newsData = [
+  {
+    title: "Portal Space Systems Expands Manufacturing Footprint with New 50,000 Sq. Ft. Facility in Bothell, WA",
+    image: "https://cdn.prod.website-files.com/67f8bd9d630dd52ec429fb93/685545c256fb25811dad7522_Portal%20Space%20Systems%20Expands.avif",
+    link: "/news/portal-space-systems-expands-manufacturing-footprint-with-new-50-000-sq-ft-facility-in-bothell-wa"
+  },
+  {
+    title: "Revolutionary IoT Platform Launches to Transform Industrial Automation",
+    image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop",
+    link: "/news/iot-platform-launches"
+  },
+  {
+    title: "AI-Powered Robotics Division Secures $50M Series B Funding Round",
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=300&fit=crop",
+    link: "/news/ai-robotics-funding"
+  },
+  {
+    title: "Partnership with NASA for Next-Generation Space Technology Development",
+    image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=300&fit=crop",
+    link: "/news/nasa-partnership"
+  },
+  {
+    title: "Breakthrough in Quantum Computing Integration with Industrial Systems",
+    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop",
+    link: "/news/quantum-computing-breakthrough"
+  }
+];
 
 export default function HomePage() {
   const [currentSection, setCurrentSection] = useState(0);
@@ -101,6 +132,21 @@ export default function HomePage() {
 }
 
 export const HeroSection = () => {
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+
+  // Auto-rotate news cards every 3 seconds
+  useEffect(() => {
+    const newsInterval = setInterval(() => {
+      setCurrentNewsIndex((prevIndex) => 
+        (prevIndex + 1) % newsData.length
+      );
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(newsInterval);
+  }, []);
+
+  const currentNews = newsData[currentNewsIndex];
+
   return (
     <section className="relative w-full h-screen overflow-hidden">
       <GradientBlinds
@@ -125,9 +171,10 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className={`text-white font-bold max-w-3xl mx-auto text-center lg:text-left ${styles["text-responsive-heading-1"]}`}
+            className={`text-white font-bold max-w-3xl mx-auto text-center ${styles["text-responsive-heading-1"]}`}
           >
-            Maneuverability when you need it. On demand.
+           From Idea to Prototype:
+            Seamlessly access to tools and resources.
           </motion.h1>
 
           {/* CTA Button */}
@@ -156,25 +203,26 @@ export const HeroSection = () => {
           </motion.button>
         </div>
 
-        {/* News Highlight Card */}
+        {/* Animated News Carousel Card */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          key={currentNewsIndex} // This ensures re-animation on each change
+          initial={{ opacity: 0, y: 40, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -40, scale: 0.9 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           className="h-fit w-fit"
         >
           <div className={styles["card"]}>
             <div className={styles["card-content"]}>
               <p className="p-m mb-3">
-                Portal Space Systems Expands Manufacturing Footprint with New
-                50,000 Sq. Ft. Facility in Bothell, WA{" "}
+                {currentNews.title}
               </p>
               <div className={styles["content-bottom"]}>
                 <p className="p-m">Read more</p>
               </div>
             </div>
             <img
-              src="https://cdn.prod.website-files.com/67f8bd9d630dd52ec429fb93/685545c256fb25811dad7522_Portal%20Space%20Systems%20Expands.avif"
+              src={currentNews.image}
               loading="lazy"
               width="97"
               alt=""
@@ -182,10 +230,30 @@ export const HeroSection = () => {
             />
             <div className={styles["card-overlay"]}></div>
             <a
-              href="/news/portal-space-systems-expands-manufacturing-footprint-with-new-50-000-sq-ft-facility-in-bothell-wa"
+              href={currentNews.link}
               className="abs-link w-inline-block"
             ></a>
           </div>
+        </motion.div>
+
+        {/* News Indicators (Optional - shows dots for each news item) */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="flex justify-center gap-2 mt-4"
+        >
+          {newsData.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentNewsIndex(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === currentNewsIndex 
+                  ? 'bg-white' 
+                  : 'bg-white/30 hover:bg-white/50'
+              }`}
+            />
+          ))}
         </motion.div>
       </div>
 
@@ -219,7 +287,6 @@ export const HeroSection = () => {
     </section>
   );
 };
-
 
 const NextSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -293,4 +360,3 @@ const NextSection = () => {
     </section>
   );
 };
-
