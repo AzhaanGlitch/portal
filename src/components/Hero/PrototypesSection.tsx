@@ -118,7 +118,7 @@ const PrototypesSection = () => {
           className="bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm rounded-2xl p-8 border border-cyan-500/20 max-w-2xl mx-auto"
         >
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Have an Idea for a Prototype?</h3>
-          <p className="text-slate-300 mb-6">Let's collaborate to bring your innovative concepts to life with our technical expertise</p>
+          <p className="text-slate-300 mb-6">Let&lsquo;s collaborate to bring your innovative concepts to life with our technical expertise</p>
           
           <motion.button
             whileHover={{ scale: 1.05 }}

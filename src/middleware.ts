@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
 
     // 3. Define paths that a logged-in user should NOT be able to access
     // For example, if a user is logged in, they shouldn't see the login page.
-    const isAuthRestrictedPath = pathname.startsWith('/auth') || pathname.startsWith('/auth/verfiy-otp');
+    const isAuthRestrictedPath=pathname.startsWith('/auth') || pathname.startsWith('/auth/verfiy-otp');
 
     // --- REDIRECTION LOGIC ---
 
