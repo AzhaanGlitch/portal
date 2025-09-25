@@ -128,7 +128,6 @@ export default function AuthPage() {
                 const response = await api.post('/accounts/login/', authData.signIn);
 
                 if (response.status === 200) {
-                    // setUser({ email: authData.signIn.email });
                     router.push('/');
                 } else {
                     setError(response.data?.error || 'Sign-in failed');
