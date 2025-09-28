@@ -3,13 +3,14 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
+// import Timeline  from "react-timeline-component";
 
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
 import LiquidEther from "../animations/LiquidEther/LiquidEther";
 import { useTheme } from "next-themes";
-
+import HistorySection from "./HistorySection";
 export default function HomePage() {
   const [currentSection, setCurrentSection] = useState(0);
   const isScrolling = useRef(false);
@@ -373,119 +374,6 @@ const AboutSection = () => {
   );
 };
 
-const HistorySection = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  // Data for HistorySection
-  const historyData = {
-    title: "I2EDC History",
-    milestones: [
-      {
-        year: "2020",
-        event: "Launch of Protospace",
-        description: "Opened our state-of-the-art prototyping facility",
-      },
-      {
-        year: "2019",
-        event: "Founding of I2EDC",
-        description:
-          "Established the innovation cell to foster student entrepreneurship",
-      },
-      {
-        year: "2022",
-        event: "Annual Innovation Summit",
-        description: "Hosted our first major innovation conference",
-      },
-    ],
-  };
-  // Theme-based styles
-  const sectionBg = isDark
-    ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
-    : "bg-gradient-to-br from-blue-50 via-cyan-50 to-slate-100";
-
-  const titleColor = isDark ? "text-white" : "text-gray-900";
-  const subtitleGradient = isDark
-    ? "from-cyan-400 to-blue-400"
-    : "from-cyan-600 to-blue-600";
-
-  const timelineLine = isDark
-    ? "bg-gradient-to-b from-cyan-500 to-blue-500"
-    : "bg-gradient-to-b from-cyan-400 to-blue-400";
-
-  const timelineDot = isDark
-    ? "bg-gradient-to-r from-cyan-500 to-blue-500"
-    : "bg-gradient-to-r from-cyan-600 to-blue-600";
-
-  const cardBg = isDark
-    ? "bg-white/5 backdrop-blur-sm border-white/10 hover:border-white/20"
-    : "bg-white/80 backdrop-blur-sm border-gray-200 hover:border-gray-300";
-
-  const eventColor = isDark ? "text-white" : "text-gray-900";
-  const yearColor = isDark ? "text-gray-300" : "text-gray-600";
-  const descriptionColor = isDark ? "text-gray-400" : "text-gray-500";
-
-  return (
-    <section
-      className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}
-    >
-      <div className="relative z-10 px-6 max-w-4xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className={`text-4xl md:text-5xl font-bold ${titleColor} mb-12 text-center`}
-        >
-          {historyData.title.split(" ")[0]}{" "}
-          <span
-            className={`text-transparent bg-gradient-to-r ${subtitleGradient} bg-clip-text`}
-          >
-            {historyData.title.split(" ")[1]}
-          </span>
-        </motion.h2>
-
-        <div className="relative">
-          {/* Timeline line */}
-          <div
-            className={`absolute left-8 top-0 bottom-0 w-0.5 ${timelineLine}`}
-          ></div>
-
-          {historyData.milestones.map((milestone, index) => (
-            <motion.div
-              key={milestone.year}
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="relative flex items-center mb-12 last:mb-0"
-            >
-              {/* Timeline dot */}
-              <div
-                className={`absolute left-0 w-16 h-16 rounded-full ${timelineDot} flex items-center justify-center z-10 shadow-lg`}
-              >
-                <span className="text-white font-bold text-sm">
-                  {milestone.year}
-                </span>
-              </div>
-
-              <div
-                className={`ml-24 rounded-2xl p-6 border transition-all duration-300 ${cardBg}`}
-              >
-                <h3 className={`text-xl font-bold ${eventColor} mb-2`}>
-                  {milestone.event}
-                </h3>
-                <p className={`text-sm font-medium ${yearColor} mb-2`}>
-                  {milestone.year}
-                </p>
-                <p className={`text-sm ${descriptionColor}`}>
-                  {milestone.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const EventsSection = () => {
   const { theme } = useTheme();
