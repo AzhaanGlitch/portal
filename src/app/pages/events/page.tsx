@@ -7,7 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon, ClockIcon, MapPinIcon, UserIcon, UsersIcon, SearchIcon, FilterIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon } from "lucide-react";
+import { 
+  CalendarIcon, 
+  ClockIcon, 
+  MapPinIcon, 
+  UserIcon, 
+  UsersIcon, 
+  SearchIcon, 
+  FilterIcon, 
+  ChevronLeftIcon, 
+  ChevronRightIcon, 
+  ArrowRightIcon,
+  XIcon,
+  MenuIcon
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -16,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 type Event = {
   id: number;
@@ -47,6 +61,7 @@ export default function EventsListPage() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [eventsPerPage] = useState(6);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   // Fetch events on component mount
   useEffect(() => {
@@ -236,9 +251,151 @@ export default function EventsListPage() {
     return event?.location || "Online";
   };
 
+  // Filter component to avoid duplication
+  const FilterContent = () => (
+    <div className="space-y-4">
+      {/* Search Input */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Search Events</label>
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by title or description..."
+            value={filters.search}
+            onChange={(e) => {
+              setFilters({ ...filters, search: e.target.value });
+              setCurrentPage(1);
+            }}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* Location Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Location</label>
+        <Input
+          placeholder="Filter by location..."
+          value={filters.location}
+          onChange={(e) => {
+            setFilters({ ...filters, location: e.target.value });
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+
+      {/* Status Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Event Status</label>
+        <Select
+          value={filters.status}
+          onValueChange={(value: EventFilters["status"]) => {
+            setFilters({ ...filters, status: value });
+            setCurrentPage(1);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Events</SelectItem>
+            <SelectItem value="upcoming">Upcoming</SelectItem>
+            <SelectItem value="ongoing">Happening Now</SelectItem>
+            <SelectItem value="past">Past Events</SelectItem>
+            <SelectItem value="registration-open">Registration Open</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Sort Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Sort By</label>
+        <Select
+          value={filters.sort}
+          onValueChange={(value: EventFilters["sort"]) => {
+            setFilters({ ...filters, sort: value });
+            setCurrentPage(1);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest First</SelectItem>
+            <SelectItem value="oldest">Oldest First</SelectItem>
+            <SelectItem value="name">Title (A-Z)</SelectItem>
+            <SelectItem value="participants">Most Popular</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Results Count */}
+      <div className="pt-4 border-t">
+        <div className="text-sm text-muted-foreground">
+          Showing {currentEvents.length} of {filteredEvents.length} events
+        </div>
+        <div className="text-xs text-muted-foreground mt-1">
+          Page {currentPage} of {totalPages}
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      {events.length > 0 && (
+        <div className="space-y-3 pt-4 border-t">
+          <h4 className="text-sm font-medium">Event Statistics</h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-lg font-bold text-primary">{events.length}</div>
+              <div className="text-xs text-muted-foreground">Total Events</div>
+            </div>
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-lg font-bold text-blue-600">
+                {events.filter(e => getEventStatus(e) === 'upcoming').length}
+              </div>
+              <div className="text-xs text-muted-foreground">Upcoming</div>
+            </div>
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-lg font-bold text-green-600">
+                {events.filter(e => getEventStatus(e) === 'ongoing').length}
+              </div>
+              <div className="text-xs text-muted-foreground">Happening Now</div>
+            </div>
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-lg font-bold text-orange-600">
+                {events.filter(e => {
+                  try {
+                    return new Date(e.reg_end_date) >= new Date();
+                  } catch {
+                    return false;
+                  }
+                }).length}
+              </div>
+              <div className="text-xs text-muted-foreground">Registration Open</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear Filters */}
+      {(filters.search || filters.status !== "all" || filters.location) && (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full mt-2"
+          onClick={() => {
+            setFilters({ search: "", status: "all", sort: "newest", location: "" });
+            setCurrentPage(1);
+          }}
+        >
+          Clear All Filters
+        </Button>
+      )}
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 mt-24">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -250,7 +407,7 @@ export default function EventsListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 mt-24">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -262,157 +419,99 @@ export default function EventsListPage() {
           </p>
         </div>
 
+        {/* Mobile Filter Button */}
+        <div className="lg:hidden mb-6">
+          <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full justify-start gap-2">
+                <FilterIcon className="h-4 w-4" />
+                Filters & Search
+                {(filters.search || filters.status !== "all" || filters.location) && (
+                  <Badge variant="secondary" className="ml-auto">
+                    Active
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85vw] sm:w-[400px] overflow-y-auto px-4">
+              <SheetHeader className="text-left">
+                <SheetTitle className="flex items-center gap-2">
+                  <FilterIcon className="h-5 w-5" />
+                  Find Events
+                </SheetTitle>
+              </SheetHeader>
+              <div className="mt-6">
+                <FilterContent />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Filters Sidebar */}
-          <Card className="lg:w-80 h-fit sticky top-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FilterIcon className="h-5 w-5" />
-                Find Events
-              </CardTitle>
-              <CardDescription>
-                Filter events by your preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Search Input */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Search Events</label>
-                <div className="relative">
-                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by title or description..."
-                    value={filters.search}
-                    onChange={(e) => {
-                      setFilters({ ...filters, search: e.target.value });
-                      setCurrentPage(1);
-                    }}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              {/* Location Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Location</label>
-                <Input
-                  placeholder="Filter by location..."
-                  value={filters.location}
-                  onChange={(e) => {
-                    setFilters({ ...filters, location: e.target.value });
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
-
-              {/* Status Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Event Status</label>
-                <Select
-                  value={filters.status}
-                  onValueChange={(value: EventFilters["status"]) => {
-                    setFilters({ ...filters, status: value });
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Events</SelectItem>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="ongoing">Happening Now</SelectItem>
-                    <SelectItem value="past">Past Events</SelectItem>
-                    <SelectItem value="registration-open">Registration Open</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Sort Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Sort By</label>
-                <Select
-                  value={filters.sort}
-                  onValueChange={(value: EventFilters["sort"]) => {
-                    setFilters({ ...filters, sort: value });
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                    <SelectItem value="name">Title (A-Z)</SelectItem>
-                    <SelectItem value="participants">Most Popular</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Results Count */}
-              <div className="pt-4 border-t">
-                <div className="text-sm text-muted-foreground">
-                  Showing {currentEvents.length} of {filteredEvents.length} events
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Page {currentPage} of {totalPages}
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              {events.length > 0 && (
-                <div className="space-y-3 pt-4 border-t">
-                  <h4 className="text-sm font-medium">Event Statistics</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="text-center p-2 bg-muted/50 rounded">
-                      <div className="text-lg font-bold text-primary">{events.length}</div>
-                      <div className="text-xs text-muted-foreground">Total Events</div>
-                    </div>
-                    <div className="text-center p-2 bg-muted/50 rounded">
-                      <div className="text-lg font-bold text-blue-600">
-                        {events.filter(e => getEventStatus(e) === 'upcoming').length}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Upcoming</div>
-                    </div>
-                    <div className="text-center p-2 bg-muted/50 rounded">
-                      <div className="text-lg font-bold text-green-600">
-                        {events.filter(e => getEventStatus(e) === 'ongoing').length}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Happening Now</div>
-                    </div>
-                    <div className="text-center p-2 bg-muted/50 rounded">
-                      <div className="text-lg font-bold text-orange-600">
-                        {events.filter(e => {
-                          try {
-                            return new Date(e.reg_end_date) >= new Date();
-                          } catch {
-                            return false;
-                          }
-                        }).length}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Registration Open</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Clear Filters */}
-              {(filters.search || filters.status !== "all" || filters.location) && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-2"
-                  onClick={() => setFilters({ search: "", status: "all", sort: "newest", location: "" })}
-                >
-                  Clear All Filters
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          {/* Desktop Filters Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block lg:w-80">
+            <Card className="h-fit sticky top-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FilterIcon className="h-5 w-5" />
+                  Find Events
+                </CardTitle>
+                <CardDescription>
+                  Filter events by your preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FilterContent />
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Main Content */}
           <div className="flex-1">
+            {/* Active Filters Display - Mobile */}
+            <div className="lg:hidden mb-6">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Active filters:</span>
+                {filters.search && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    Search: {filters.search}
+                    <XIcon 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => setFilters({ ...filters, search: "" })}
+                    />
+                  </Badge>
+                )}
+                {filters.status !== "all" && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    Status: {filters.status}
+                    <XIcon 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => setFilters({ ...filters, status: "all" })}
+                    />
+                  </Badge>
+                )}
+                {filters.location && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    Location: {filters.location}
+                    <XIcon 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => setFilters({ ...filters, location: "" })}
+                    />
+                  </Badge>
+                )}
+                {(filters.search || filters.status !== "all" || filters.location) && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 text-xs"
+                    onClick={() => setFilters({ search: "", status: "all", sort: "newest", location: "" })}
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+            </div>
+
             {/* Events Grid */}
             {filteredEvents.length === 0 ? (
               <Card>

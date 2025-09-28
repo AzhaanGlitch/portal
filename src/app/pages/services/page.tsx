@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar, Clock, AlertCircle, Info, Moon, Sun, ExternalLink } from 'lucide-react';
-// import * as THREE from 'three';
-// import FOG from 'vanta/dist/vanta.fog.min';
+import { Calendar, Clock, AlertCircle, Info, ExternalLink, X, Bookmark, DollarSign, CheckCircle2, IndianRupee } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface CostDiscount {
     plan: string;
     cost: number;
     discount: number;
+    description?: string;
 }
 
 interface Service {
@@ -33,40 +33,10 @@ interface Service {
 const ServicesPage: React.FC = () => {
     const { isAuthenticated } = useAuth();
     const [services, setServices] = useState<Service[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
-    const [vantaEffect, setVantaEffect] = useState<any>(null);
-    const vantaRef = useRef<HTMLDivElement>(null);
-
-
-    //     useEffect(() => {
-    //         if (!vantaEffect && vantaRef.current) {
-    //             setVantaEffect(
-    //                 FOG({
-    //                     el: vantaRef.current,
-    //                     THREE: THREE,
-    //                     mouseControls: true,
-    //                     touchControls: true,
-    //                     gyroControls: false,
-    //                     minHeight: 200.00,
-    //                     minWidth: 200.00,
-    //                     highlightColor: 0x345c86,
-    //                     midtoneColor: 0x5a6f,
-    //                     baseColor: 0x1a3342,
-    //                     blurFactor: 0.49,
-    //                     speed: 1.80
-    //                 })
-    //             );
-    //         }
-
-    //         // Resize the Vanta effect to match the container size initially
-    //         if (vantaRef.current && vantaEffect && typeof vantaEffect.resize === 'function') {
-    //             vantaEffect.resize();
-    //         }
-    //         return () => {
-    //             if (vantaEffect) vantaEffect.destroy();
-    //         };
-    //     }, [vantaEffect]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
     useEffect(() => {
         fetchServices();
@@ -77,50 +47,47 @@ const ServicesPage: React.FC = () => {
             setLoading(true);
             const response = await api.get<Service[]>('/services/list/');
             setServices(response.data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
+            setError('');
+        } catch (err: any) {
+            setError(err.message || 'Failed to load services.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleStartService = (serviceId: number) => {
+    const handleBookService = (service: Service, plan?: CostDiscount) => {
         if (!isAuthenticated) {
-            alert('You must be logged in to access this service');
+            alert('You must be logged in to book this service');
             return;
         }
-        alert(`Service ${serviceId} will start soon!`);
+        const planInfo = plan ? ` (${plan.plan} plan)` : '';
+        alert(`Booking ${service.name}${planInfo} - We'll contact you soon!`);
+        closeOverlay();
     };
 
+    const openOverlay = (service: Service) => {
+        setSelectedService(service);
+        setIsOverlayOpen(true);
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeOverlay = () => {
+        setIsOverlayOpen(false);
+        setTimeout(() => setSelectedService(null), 300);
+        document.body.style.overflow = 'unset';
+    };
+
+    // Loading skeleton
     if (loading) {
         return (
-            <div className="relative min-h-screen">
-                {/* <div ref={vantaRef} className="absolute inset-0 z-0" /> */}
-                <div className="container mx-auto py-8 px-4 relative z-10 min-h-screen">
-                    <div className="flex flex-col gap-8 mt-10">
-                        <div className="text-center mb-8">
-                            <Skeleton className='h-10 w-80 mx-auto mb-4 bg-card/80' />
-                            <Skeleton className='h-6 w-96 mx-auto bg-card/80' />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[...Array(6)].map((_, i) => (
-                                <Card key={i} className='overflow-hidden transition-all duration-800 bg-muted border-gray-700'>
-                                    <CardHeader>
-                                        <Skeleton className='h-6 w-3/4 mb-2 bg-card/80' />
-                                        <Skeleton className='h-4 w-full bg-card/80' />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <Skeleton className='h-4 w-full mb-2 bg-card/80' />
-                                        <Skeleton className='h-4 w-2/3 mb-4 bg-card/80' />
-                                        <Skeleton className='h-4 w-1/2 mb-2 bg-card/80' />
-                                        <Skeleton className='h-4 w-3/4 bg-card/80' />
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Skeleton className='h-10 w-full bg-card/80' />
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-900/20 p-8">
+                <div className="max-w-7xl mx-auto">
+                    <Skeleton className="h-12 w-64 mb-2" />
+                    <Skeleton className="h-6 w-96 mb-12" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[...Array(6)].map((_, i) => (
+                            <Skeleton key={i} className="h-80 rounded-xl" />
+                        ))}
                     </div>
                 </div>
             </div>
@@ -129,15 +96,12 @@ const ServicesPage: React.FC = () => {
 
     if (error) {
         return (
-            <div className="relative min-h-screen">
-                {/* <div ref={vantaRef} className="absolute inset-0 z-0" /> */}
-                <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center relative z-10">
-                    <Alert variant="destructive" className="max-w-md">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-900/20 p-8">
+                <div className="max-w-7xl mx-auto">
+                    <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error</AlertTitle>
-                        <AlertDescription>
-                            {error}
-                        </AlertDescription>
+                        <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 </div>
             </div>
@@ -145,151 +109,260 @@ const ServicesPage: React.FC = () => {
     }
 
     return (
-        <div className="relative min-h-screen ">
-            {/* <div ref={vantaRef} className="absolute inset-0 z-0 w-full h-full" /> */}
-            <div className="container mx-auto px-10 py-8 relative z-10 min-h-screen">
-                <br />
-
-                <div className="mt-10 mb-12 text-center">
-                    <h1 className='text-4xl font-bold tracking-tight mb-4 text-foreground'>Our Services</h1>
-                    <p className='text-xl max-w-3xl mx-auto text-muted-foreground'>
-                        Discover our range of upcoming services. We're working hard to bring you the best experience.
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-900/20 mt-24">
+            <div className="max-w-7xl mx-auto p-8">
+                {/* Header */}
+                <div className="text-center mb-16">
+                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                        Our Services
+                    </h1>
+                    <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                        Discover our comprehensive range of professional services designed to bring your ideas to life
                     </p>
                 </div>
 
-                <Alert className='mb-10 transition-colors duration-300 bg-blue-900/20 border-blue-800'>
-                    <Info className='h-4 w-4 ' />
-                    <AlertTitle className='dark:text-blue-300 text-blue-700'>Services Coming Soon</AlertTitle>
-                    <AlertDescription className='dark:text-blue-200 text-blue-600' >
-                        Our services are currently in development and will be available shortly. Stay tuned for updates!
-                    </AlertDescription>
-                </Alert>
-
+                {/* Services Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {services.map((service) => (
-                        <Card key={service.id} className='flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 bg-card border-ring hover:border-blue-500'>
-                            <div className='h-48 flex items-center justify-center relative overflow-hidden bg-gradient-to-r from-blue-900/30 to-purple-900/30'>
-                                <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-                                <div className="text-center p-4 z-10">
-                                    <div className='w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-900/30'>
-                                        <Clock className='h-8 w-8 text-blue-400' />
-                                    </div>
-                                    <Badge variant="outline" className='bg-gray-700/80 text-blue-300 border-blue-500/30 backdrop-blur-sm'>
-                                        Coming Soon
+                    {services.map(service => (
+                        <Card 
+                            key={service.id} 
+                            className="group cursor-pointer bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300/50 dark:hover:border-blue-400/50 hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                        >
+                            <CardHeader className="pb-4">
+                                <div className="flex items-start justify-between">
+                                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        {service.name}
+                                    </CardTitle>
+                                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                        Available
                                     </Badge>
                                 </div>
-                            </div>
-
-                            <CardHeader>
-                                <CardTitle className='text-2xl text-foreground'>{service.name}</CardTitle>
-                                <CardDescription className='text-gray-400'>{service.description}</CardDescription>
+                                <CardDescription className="text-base text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    {service.description}
+                                </CardDescription>
                             </CardHeader>
-
-                            <CardContent className="flex-grow">
-                                <div className="mb-6">
-                                    <h3 className='font-semibold mb-2 flex items-center gap-2 text-secondary-foreground'>
-                                        <Calendar className="h-4 w-4" />
-                                        Availability
-                                    </h3>
-                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                        {Object.entries(service.availability_map || {}).map(
-                                            ([day, time]) => (
-                                                <div
-                                                    key={day}
-                                                    className="flex justify-between items-center py-1 border-b border-gray-700 dark:border-gray-700 border-gray-200"
-                                                >
-                                                    <span className="font-medium text-gray-800 dark:text-gray-300">{day}:</span>
-                                                    <span className="text-gray-600 dark:text-gray-400">{time}</span>
-                                                </div>
-                                            )
+                            
+                            <CardContent className="pb-4">
+                                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>Flexible scheduling</span>
+                                </div>
+                                
+                                {/* Pricing preview */}
+                                {service.cost_discount && service.cost_discount.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <IndianRupee className="w-4 h-4 text-green-600" />
+                                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                            Starting at ₹{service.cost_discount[0].cost}
+                                        </span>
+                                        {service.cost_discount[0].discount > 0 && (
+                                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                                                {service.cost_discount[0].discount}% OFF
+                                            </Badge>
                                         )}
                                     </div>
-                                </div>
-
-                                <div>
-                                    <h3 className='font-semibold mb-2 text-secondary-foreground'>Pricing Plans</h3>
-                                    <div className="space-y-3">
-                                        {service.cost_discount?.map((price) => (
-                                            <div
-                                                key={price.plan}
-                                                className="flex justify-between items-center p-3 rounded-lg bg-gray-100 dark:bg-gray-700"
-                                            >
-                                                <span className="font-medium text-gray-800 dark:text-secondary-foreground">
-                                                    {price.plan}
-                                                </span>
-                                                <div className="text-right">
-                                                    <div className="flex items-center gap-2">
-                                                        {price.discount > 0 && (
-                                                            <span className="text-sm line-through text-gray-500 dark:text-gray-400">
-                                                                ${(price.cost / (1 - price.discount / 100)).toFixed(2)}
-                                                            </span>
-                                                        )}
-                                                        <span className="font-bold text-gray-900 dark:text-foreground">
-                                                            ${price.cost}
-                                                        </span>
-                                                    </div>
-                                                    {price.discount > 0 && (
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className="mt-1 bg-green-100 text-green-700 border-green-300 dark:bg-green-800/30 dark:text-green-300 dark:border-green-700"
-                                                        >
-                                                            Save {price.discount}%
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                </div>
+                                )}
                             </CardContent>
-
-                            <CardFooter>
-                                <Button
-                                    onClick={() => handleStartService(service.id)}
-                                    disabled={!isAuthenticated}
-                                    className="w-full group"
-                                    size="lg"
-                                    variant="secondary"
+                            
+                            <CardFooter className="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <Button 
+                                    variant="outline" 
+                                    className="flex-1 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openOverlay(service);
+                                    }}
                                 >
-                                    {isAuthenticated ? (
-                                        <>
-                                            Available Soon
-                                            <ExternalLink className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </>
-                                    ) : (
-                                        'Login Required'
-                                    )}
+                                    <Info className="w-4 h-4 mr-2" />
+                                    Details
+                                </Button>
+                                <Button 
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleBookService(service);
+                                    }}
+                                    disabled={!isAuthenticated}
+                                >
+                                    <Bookmark className="w-4 h-4 mr-2" />
+                                    {isAuthenticated ? 'Book' : 'Login'}
                                 </Button>
                             </CardFooter>
                         </Card>
                     ))}
                 </div>
-
-                {services.length === 0 && (
-                    <div className="text-center py-12">
-                        <div className='rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 bg-gray-800'>
-                            <AlertCircle className='h-12 w-12 text-gray-600' />
-                        </div>
-                        <h3 className='text-2xl font-semibold mb-2 text-foreground'>No Services Available</h3>
-                        <p className='text-gray-400' >
-                            Check back later for our upcoming services.
-                        </p>
-                    </div>
-                )}
-
-                <style jsx>{`
-                    .bg-grid-pattern {
-                        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.05)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-                    }
-                    
-                    .dark .bg-grid-pattern {
-                        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.05)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-                    }
-                `}</style>
-                <br />
-                <br /><br /><br />
             </div>
+
+            {/* Professional Overlay */}
+            {selectedService && (
+                <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
+                    isOverlayOpen ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/0 backdrop-blur-0'
+                }`}>
+                    <div className={`bg-white dark:bg-gray-900 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 ${
+                        isOverlayOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                    }`}>
+                        {/* Header */}
+                        <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+                            <button
+                                onClick={closeOverlay}
+                                className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            
+                            <div className="pr-12">
+                                <h2 className="text-3xl font-bold mb-2">{selectedService.name}</h2>
+                                <p className="text-blue-100 text-lg">{selectedService.description}</p>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="overflow-y-auto max-h-[calc(90vh-200px)]">
+                            <div className="p-8">
+                                {/* Markdown Content */}
+                                <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
+                                    <ReactMarkdown
+                                        components={{
+                                            h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 mt-6" {...props} />,
+                                            h2: ({node, ...props}) => <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 mt-5" {...props} />,
+                                            h3: ({node, ...props}) => <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2 mt-4" {...props} />,
+                                            p: ({node, ...props}) => <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed" {...props} />,
+                                            ul: ({node, ...props}) => <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 mb-4 space-y-1" {...props} />,
+                                            ol: ({node, ...props}) => <ol className="list-decimal list-inside text-gray-700 dark:text-gray-300 mb-4 space-y-1" {...props} />,
+                                            li: ({node, ...props}) => <li className="text-gray-700 dark:text-gray-300" {...props} />,
+                                            strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+                                            a: ({node, ...props}) => <a className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline" {...props} />,
+                                        }}
+                                    >
+                                        {selectedService.long_description}
+                                    </ReactMarkdown>
+                                </div>
+
+                                {/* Pricing Plans Section */}
+                                <div className="mb-8">
+                                    <h3 className="font-semibold text-2xl mb-6 flex items-center gap-2 text-gray-900 dark:text-white">
+                                        <IndianRupee className="w-6 h-6 text-green-600" />
+                                        Pricing & Booking Plans
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {selectedService.cost_discount?.map((plan, index) => (
+                                            <div
+                                                key={plan.plan}
+                                                className="p-6 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-400 transition-all duration-300 hover:shadow-lg group"
+                                            >
+                                                <div className="flex flex-col h-full">
+                                                    {/* Plan Header */}
+                                                    <div className="flex-1">
+                                                        <div className="flex justify-between items-start mb-4">
+                                                            <div>
+                                                                <h4 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                    {plan.plan}
+                                                                </h4>
+                                                                {plan.description && (
+                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                                                        {plan.description}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                            {plan.discount > 0 && (
+                                                                <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-sm">
+                                                                    {plan.discount}% OFF
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Pricing */}
+                                                        <div className="mb-4">
+                                                            {plan.discount > 0 && (
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <span className="text-sm line-through text-gray-500 dark:text-gray-400">
+                                                                        ₹{(plan.cost / (1 - plan.discount / 100)).toFixed(2)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            <div className="flex items-center gap-1">
+                                                                <IndianRupee className="w-5 h-5 text-green-600" />
+                                                                <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                                                                    {plan.cost}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Book Button */}
+                                                    <Button 
+                                                        className="w-full bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40 transition-all duration-300"
+                                                        onClick={() => handleBookService(selectedService, plan)}
+                                                        disabled={!isAuthenticated}
+                                                        size="lg"
+                                                    >
+                                                        <Bookmark className="w-4 h-4 mr-2" />
+                                                        {isAuthenticated ? `Book ${plan.plan}` : 'Login to Book'}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Quick Book Section */}
+                                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700">
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <CheckCircle2 className="w-6 h-6 text-green-600" />
+                                            <div>
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                    Ready to get started?
+                                                </h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    Book your preferred plan or contact us for custom requirements
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button 
+                                            className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 whitespace-nowrap"
+                                            onClick={() => handleBookService(selectedService)}
+                                            disabled={!isAuthenticated}
+                                            size="lg"
+                                        >
+                                            <Bookmark className="w-4 h-4 mr-2" />
+                                            {isAuthenticated ? 'Quick Book' : 'Login to Book'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800/50">
+                            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                    Professional service with guaranteed quality
+                                </div>
+                                <div className="flex gap-3">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={closeOverlay}
+                                        className="min-w-24"
+                                    >
+                                        Close
+                                    </Button>
+                                    <Button 
+                                        className="min-w-24 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25"
+                                        onClick={() => handleBookService(selectedService)}
+                                        disabled={!isAuthenticated}
+                                        size="lg"
+                                    >
+                                        <Bookmark className="w-4 h-4 mr-2" />
+                                        {isAuthenticated ? 'Book Now' : 'Login to Book'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
