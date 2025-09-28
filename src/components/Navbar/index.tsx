@@ -22,8 +22,8 @@ const Header = () => {
 
   // Colors based on theme
   const headerBgColor = isDark
-    ? "rgba(15, 23, 42, 0.9)"
-    : "rgba(255, 255, 255, 0.9)";
+    ? "rgba(15, 23, 42, 0.2)"
+    : "rgba(255, 255, 255, 0.14)";
   const headerBgColorScrolled = isDark
     ? "rgba(15, 23, 42, 0.95)"
     : "rgba(255, 255, 255, 0.95)";
@@ -101,7 +101,7 @@ const Header = () => {
         y: showNav || isMenuOpen ? 0 : -100,
         height:
           isMobile && isMenuOpen ? "100vh" : isTop && !isMobile ? 100 : 70,
-        backgroundColor: finalBackgroundColor,
+        backgroundColor: isTop && !isMenuOpen ?headerBgColor: finalBackgroundColor,
         backdropFilter: isTop && !isMenuOpen ? "none" : "blur(10px)",
         borderBottom:
           isTop && !isMenuOpen
