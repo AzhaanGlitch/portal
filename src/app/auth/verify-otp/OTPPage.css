@@ -151,7 +151,9 @@
     text-transform: uppercase;
     transition: all 0.3s;
     cursor: pointer;
+    height: fit-content;
     margin-bottom: 20px;
+    max-width: 250px;
 }
 
 .otp-button:hover:not(:disabled) {

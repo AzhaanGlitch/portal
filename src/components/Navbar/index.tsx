@@ -126,6 +126,12 @@ const Header = () => {
             Services
           </a>
           <a
+            href="/pages/events"
+            className="relative font-medium text-sm text-foreground transition-colors duration-300 hover:text-primary after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+          >
+            Events
+          </a>
+          <a
             href="/pages/contact"
             className="relative font-medium text-sm text-foreground transition-colors duration-300 hover:text-primary after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
           >
