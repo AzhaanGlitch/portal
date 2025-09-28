@@ -26,6 +26,10 @@ type Event = {
   updated_at?: string;
 };
 
+interface EventParticipation {
+  is_participating: boolean;
+}
+
 export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -34,9 +38,10 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [isParticipating, setIsParticipating] = useState(false);
+  const [eventParticipation, setEventParticipation] = useState<EventParticipation | null>(null);
+  const [participationLoading, setParticipationLoading] = useState(true);
 
-  // Fetch event details
+  // Fetch event details and participation status
   useEffect(() => {
     if (eventId) {
       fetchEvent();
@@ -61,11 +66,19 @@ export default function EventDetailPage() {
 
   const checkParticipation = async () => {
     try {
-      // Replace with your actual API endpoint to check participation
-      const response = await api.get(`/events/${eventId}/participants/me/`);
-      setIsParticipating(response.data.is_participating || false);
-    } catch (err) {
-      setIsParticipating(false);
+      setParticipationLoading(true);
+      const response = await api.get<EventParticipation>(`/events/events/${eventId}/participants/me/`);
+      setEventParticipation(response.data);
+    } catch (error: any) {
+      // If endpoint returns 404 or error, user is not participating
+      if (error.response?.status === 404) {
+        setEventParticipation({ is_participating: false });
+      } else {
+        console.error("Error checking participation:", error);
+        setEventParticipation({ is_participating: false });
+      }
+    } finally {
+      setParticipationLoading(false);
     }
   };
 
@@ -75,7 +88,7 @@ export default function EventDetailPage() {
     try {
       setIsRegistering(true);
       await api.post(`/events/add-participant/${eventId}/`);
-      setIsParticipating(true);
+      setEventParticipation({ is_participating: true });
       toast.success("Successfully registered for the event!");
       
       // Refresh event data to get updated participant count
@@ -95,7 +108,7 @@ export default function EventDetailPage() {
     try {
       setIsRegistering(true);
       await api.delete(`/events/${eventId}/unregister/`);
-      setIsParticipating(false);
+      setEventParticipation({ is_participating: false });
       toast.success("Successfully unregistered from the event!");
       
       // Refresh event data to get updated participant count
@@ -135,17 +148,36 @@ export default function EventDetailPage() {
     }
   };
 
+  // Safe value getter with defaults
+  const getSafeString = (value: any, defaultValue: string = ""): string => {
+    return value ? String(value).toLowerCase() : defaultValue;
+  };
+
+  // Safe date parser
+  const getSafeDate = (dateString: any): Date => {
+    try {
+      return dateString ? new Date(dateString) : new Date(0);
+    } catch {
+      return new Date(0);
+    }
+  };
+
   const getEventStatus = () => {
     if (!event) return "past";
 
     const now = new Date();
-    const eventDate = new Date(event.date);
-    const regEndDate = new Date(event.reg_end_date);
+    const eventDate = getSafeDate(event.date);
+    const regEndDate = getSafeDate(event.reg_end_date);
+
+    // Skip events with invalid dates
+    if (isNaN(eventDate.getTime()) || isNaN(regEndDate.getTime())) {
+      return "past";
+    }
 
     if (eventDate < now) return "past";
     
     const isSameDay = eventDate.toDateString() === now.toDateString();
-    if (isSameDay) return "ongoing";
+    if (isSameDay || (eventDate <= now && regEndDate >= now)) return "ongoing";
     
     if (regEndDate < now) return "registration-closed";
     return "upcoming";
@@ -168,34 +200,70 @@ export default function EventDetailPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return "Invalid Date";
+    }
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      return new Date(dateString).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return "Invalid Time";
+    }
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      return new Date(dateString).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return "Invalid Date/Time";
+    }
   };
 
-  const canRegister = () => {
+  // Check if user is registered for the event
+  const isUserRegistered = (): boolean => {
+    return eventParticipation?.is_participating || false;
+  };
+
+  // Check if registration is open for the event
+  const canRegister = (): boolean => {
     if (!event) return false;
-    const status = getEventStatus();
-    return status === "upcoming" && !isParticipating;
+    
+    try {
+      const status = getEventStatus();
+      const registrationOpen = new Date(event.reg_end_date) >= new Date();
+      return (status === "upcoming" || status === "ongoing") && registrationOpen && !isUserRegistered();
+    } catch {
+      return false;
+    }
+  };
+
+  const getSafeParticipantCount = () => {
+    return event && Array.isArray(event.participants) ? event.participants.length : 0;
+  };
+
+  const getSafeAdminName = () => {
+    return event?.admin?.username || "Unknown Organizer";
+  };
+
+  const getSafeLocation = () => {
+    return event?.location || "Online";
   };
 
   if (loading) {
@@ -232,6 +300,9 @@ export default function EventDetailPage() {
       </div>
     );
   }
+
+  const userRegistered = isUserRegistered();
+  const registrationAllowed = canRegister();
 
   return (
     <div className="mt-24 min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
@@ -274,9 +345,20 @@ export default function EventDetailPage() {
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Participants:</span>
                   <span className="text-sm font-medium">
-                    {event.participants.length}
+                    {getSafeParticipantCount()}
                   </span>
                 </div>
+                {/* Participation Status */}
+                {!participationLoading && (
+                  <div className="flex justify-between pt-2 border-t">
+                    <span className="text-sm text-muted-foreground">Your Status:</span>
+                    <span className={`text-sm font-medium ${
+                      userRegistered ? "text-green-600" : "text-muted-foreground"
+                    }`}>
+                      {userRegistered ? "Registered" : "Not Registered"}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -309,7 +391,7 @@ export default function EventDetailPage() {
                   <MapPinIcon className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <div className="text-sm font-medium">Location</div>
-                    <div className="text-sm text-muted-foreground">{event.location || "Online"}</div>
+                    <div className="text-sm text-muted-foreground">{getSafeLocation()}</div>
                   </div>
                 </div>
                 
@@ -317,7 +399,7 @@ export default function EventDetailPage() {
                   <UserIcon className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <div className="text-sm font-medium">Organizer</div>
-                    <div className="text-sm text-muted-foreground">{event.admin.username}</div>
+                    <div className="text-sm text-muted-foreground">{getSafeAdminName()}</div>
                   </div>
                 </div>
 
@@ -349,18 +431,18 @@ export default function EventDetailPage() {
                   Share Event
                 </Button>
                 
-                {canRegister() && (
+                {registrationAllowed && (
                   <Button 
                     className="w-full justify-start bg-primary hover:bg-primary/90"
                     onClick={handleRegister}
-                    disabled={isRegistering}
+                    disabled={isRegistering || participationLoading}
                   >
                     <UserCheckIcon className="h-4 w-4 mr-2" />
                     {isRegistering ? "Registering..." : "Register Now"}
                   </Button>
                 )}
                 
-                {isParticipating && (
+                {userRegistered && (
                   <Button 
                     variant="outline" 
                     className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -416,8 +498,14 @@ export default function EventDetailPage() {
                       {getStatusBadge()}
                       <Badge variant="secondary" className="text-sm">
                         <UsersIcon className="h-3 w-3 mr-1" />
-                        {event.participants.length} participants
+                        {getSafeParticipantCount()} participants
                       </Badge>
+                      {userRegistered && (
+                        <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
+                          <UserCheckIcon className="h-3 w-3 mr-1" />
+                          Registered
+                        </Badge>
+                      )}
                     </div>
                     <h1 className="text-3xl lg:text-4xl font-bold mb-2">{event.title}</h1>
                     <p className="text-lg text-muted-foreground">{event.description}</p>
@@ -428,16 +516,16 @@ export default function EventDetailPage() {
                       <ShareIcon className="h-4 w-4 mr-2" />
                       Share
                     </Button>
-                    {canRegister() && (
+                    {registrationAllowed && (
                       <Button 
                         onClick={handleRegister}
-                        disabled={isRegistering}
+                        disabled={isRegistering || participationLoading}
                         className="bg-primary hover:bg-primary/90"
                       >
                         {isRegistering ? "Registering..." : "Register Now"}
                       </Button>
                     )}
-                    {isParticipating && (
+                    {userRegistered && (
                       <Button 
                         variant="outline" 
                         onClick={handleUnregister}

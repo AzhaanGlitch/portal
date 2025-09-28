@@ -91,7 +91,7 @@ const ContactFormSection = () => {
   };
 
   return (
-    <section className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg} py-20`}>
+    <section className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg} py-20`} id="form">
       <div className="relative z-10 px-4 max-w-3xl w-full">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-center mb-12 ${titleColor}`}
