@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import LiquidEther from "../animations/LiquidEther/LiquidEther";
-
+import Link from "next/link";
 export default function AboutPage() {
   return (
     <div className="relative">
@@ -24,28 +24,38 @@ const AboutHeroSection = () => {
   return (
     <section className="relative w-full h-screen overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0">
-        <LiquidEther />
+      <div className="absolute inset-0 pointer-events-none">
+        <LiquidEther autoDemo={true} />
       </div>
 
       {/* Content */}
-      <div className={`relative z-10 h-full flex flex-col justify-center items-center text-center px-6 ${
-        isDark ? "text-white" : "text-gray-900"
-      }`}>
+      <div
+        className={`relative z-10 h-full flex flex-col justify-center items-center text-center px-6 ${
+          isDark ? "text-white" : "text-gray-900"
+        }`}
+      >
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="font-bold text-5xl md:text-6xl lg:text-7xl mb-6"
         >
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-blue-400 to-purple-600" : "from-blue-600 to-purple-700"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark
+                ? "from-blue-400 to-purple-600"
+                : "from-blue-600 to-purple-700"
+            } bg-clip-text text-transparent`}
+          >
             About
           </span>{" "}
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-green-400 to-cyan-600" : "from-green-600 to-cyan-700"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark
+                ? "from-green-400 to-cyan-600"
+                : "from-green-600 to-cyan-700"
+            } bg-clip-text text-transparent`}
+          >
             I2EDC
           </span>
         </motion.h1>
@@ -58,8 +68,8 @@ const AboutHeroSection = () => {
             isDark ? "text-gray-300" : "text-gray-700"
           }`}
         >
-          Fostering innovation and entrepreneurship through cutting-edge resources, 
-          mentorship, and a vibrant community of student innovators
+          Fostering innovation and entrepreneurship through cutting-edge
+          resources, mentorship, and a vibrant community of student innovators
         </motion.p>
 
         <motion.div
@@ -68,17 +78,20 @@ const AboutHeroSection = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
         >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 border ${
-              isDark
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
-                : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
-            }`}
-          >
-            Our Mission
-          </motion.button>
+          <Link href={"#mission"}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 border ${
+                isDark
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+                  : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
+              }`}
+            >
+              Our Mission
+            </motion.button>
+          </Link>
+          <Link href={"#team"}>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -90,6 +103,7 @@ const AboutHeroSection = () => {
           >
             Meet the Team
           </motion.button>
+          </Link>
         </motion.div>
       </div>
 
@@ -140,7 +154,9 @@ const MissionSection = () => {
   const accentColor = isDark ? "text-blue-400" : "text-blue-600";
 
   return (
-    <section className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}>
+    <section
+      className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`} id="mission"
+    >
       <div className="relative z-10 px-4 max-w-4xl mx-auto">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-center mb-12 ${titleColor}`}
@@ -150,9 +166,11 @@ const MissionSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           Our{" "}
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-blue-400 to-cyan-400" : "from-blue-600 to-cyan-600"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark ? "from-blue-400 to-cyan-400" : "from-blue-600 to-cyan-600"
+            } bg-clip-text text-transparent`}
+          >
             Mission
           </span>
         </motion.h2>
@@ -165,13 +183,15 @@ const MissionSection = () => {
           className={`text-lg md:text-xl leading-relaxed text-center mb-12 ${textColor}`}
         >
           <p className="mb-6">
-            At the Institute Innovation Entrepreneurship Development Cell (I2EDC), 
-            we're revolutionizing student innovation with state-of-the-art facilities 
-            and mentorship that empower students to transform ideas into reality.
+            At the Institute Innovation Entrepreneurship Development Cell
+            (I2EDC), we're revolutionizing student innovation with
+            state-of-the-art facilities and mentorship that empower students to
+            transform ideas into reality.
           </p>
           <p>
-            Our mission is to provide accessible innovation resources, foster entrepreneurial 
-            thinking, and build a vibrant community where creativity meets execution.
+            Our mission is to provide accessible innovation resources, foster
+            entrepreneurial thinking, and build a vibrant community where
+            creativity meets execution.
           </p>
         </motion.div>
 
@@ -207,7 +227,9 @@ const MissionSection = () => {
               whileHover={{ y: -5, scale: 1.02 }}
               className={`rounded-2xl p-6 border transition-all duration-300 ${cardBg}`}
             >
-              <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${item.gradient} mb-4 flex items-center justify-center text-white text-xl`}>
+              <div
+                className={`w-12 h-12 rounded-lg bg-gradient-to-r ${item.gradient} mb-4 flex items-center justify-center text-white text-xl`}
+              >
                 {item.icon}
               </div>
               <h3 className={`text-xl font-bold mb-3 ${accentColor}`}>
@@ -241,32 +263,38 @@ const ValuesSection = () => {
   const values = [
     {
       title: "Excellence",
-      description: "We pursue technical excellence in every project, from prototyping to execution.",
+      description:
+        "We pursue technical excellence in every project, from prototyping to execution.",
       icon: "⭐",
       gradient: "from-yellow-500 to-orange-500",
     },
     {
       title: "Innovation",
-      description: "We challenge conventions and pioneer new approaches to problem-solving.",
+      description:
+        "We challenge conventions and pioneer new approaches to problem-solving.",
       icon: "💡",
       gradient: "from-blue-500 to-cyan-500",
     },
     {
       title: "Collaboration",
-      description: "We believe great achievements are born from teamwork and shared vision.",
+      description:
+        "We believe great achievements are born from teamwork and shared vision.",
       icon: "🤝",
       gradient: "from-green-500 to-teal-500",
     },
     {
       title: "Integrity",
-      description: "We operate with transparency, honesty, and ethical principles.",
+      description:
+        "We operate with transparency, honesty, and ethical principles.",
       icon: "🔒",
       gradient: "from-purple-500 to-pink-500",
     },
   ];
 
   return (
-    <section className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}>
+    <section
+      className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}
+    >
       <div className="relative z-10 px-4 max-w-6xl mx-auto">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-center mb-16 ${titleColor}`}
@@ -276,9 +304,13 @@ const ValuesSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           Our{" "}
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-purple-400 to-pink-400" : "from-purple-600 to-pink-600"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark
+                ? "from-purple-400 to-pink-400"
+                : "from-purple-600 to-pink-600"
+            } bg-clip-text text-transparent`}
+          >
             Values
           </span>
         </motion.h2>
@@ -293,7 +325,9 @@ const ValuesSection = () => {
               viewport={{ once: true, margin: "-100px" }}
               className={`rounded-2xl p-8 border transition-all duration-300 hover:shadow-lg ${cardBg}`}
             >
-              <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${value.gradient} mb-6 flex items-center justify-center text-white text-xl`}>
+              <div
+                className={`w-12 h-12 rounded-lg bg-gradient-to-r ${value.gradient} mb-6 flex items-center justify-center text-white text-xl`}
+              >
                 {value.icon}
               </div>
               <h3 className={`text-2xl font-bold mb-3 ${accentColor}`}>
@@ -312,8 +346,9 @@ const ValuesSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           <p className={`text-xl max-w-3xl mx-auto ${textColor}`}>
-            These values guide our decisions, shape our culture, and drive us toward 
-            our vision of creating the next generation of innovators and entrepreneurs.
+            These values guide our decisions, shape our culture, and drive us
+            toward our vision of creating the next generation of innovators and
+            entrepreneurs.
           </p>
         </motion.div>
       </div>
@@ -346,9 +381,9 @@ const HistorySection = () => {
       year: "2019",
       event: "Launched Protospace with initial prototyping equipment",
     },
-    { 
-      year: "2020", 
-      event: "Expanded to include Tinkering Lab and Machine Services" 
+    {
+      year: "2020",
+      event: "Expanded to include Tinkering Lab and Machine Services",
     },
     {
       year: "2022",
@@ -361,7 +396,9 @@ const HistorySection = () => {
   ];
 
   return (
-    <section className={`relative w-full min-h-screen flex items-center justify-center pt-20 ${sectionBg}`}>
+    <section
+      className={`relative w-full min-h-screen flex items-center justify-center pt-20 ${sectionBg}`}
+    >
       <div className="relative z-10 px-4 max-w-6xl mx-auto">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-center mb-16 ${titleColor}`}
@@ -371,20 +408,26 @@ const HistorySection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           Our{" "}
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-green-400 to-cyan-400" : "from-green-600 to-cyan-600"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark
+                ? "from-green-400 to-cyan-400"
+                : "from-green-600 to-cyan-600"
+            } bg-clip-text text-transparent`}
+          >
             Journey
           </span>
         </motion.h2>
 
         <div className="relative">
           {/* Vertical timeline line */}
-          <div className={`absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b ${
-            isDark 
-              ? "from-green-500/30 via-cyan-500/30 to-blue-500/30" 
-              : "from-green-400/50 via-cyan-400/50 to-blue-400/50"
-          } transform -translate-x-1/2 hidden md:block`}></div>
+          <div
+            className={`absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b ${
+              isDark
+                ? "from-green-500/30 via-cyan-500/30 to-blue-500/30"
+                : "from-green-400/50 via-cyan-400/50 to-blue-400/50"
+            } transform -translate-x-1/2 hidden md:block`}
+          ></div>
 
           {milestones.map((milestone, index) => (
             <motion.div
@@ -398,9 +441,13 @@ const HistorySection = () => {
               }`}
             >
               {/* Content */}
-              <div className={`w-full md:w-1/2 p-4 ${
-                index % 2 === 0 ? "md:pl-8 md:text-left" : "md:pr-8 md:text-right"
-              }`}>
+              <div
+                className={`w-full md:w-1/2 p-4 ${
+                  index % 2 === 0
+                    ? "md:pl-8 md:text-left"
+                    : "md:pr-8 md:text-right"
+                }`}
+              >
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className={`rounded-2xl p-6 border transition-all duration-300 ${cardBg}`}
@@ -413,13 +460,17 @@ const HistorySection = () => {
               </div>
 
               {/* Timeline marker */}
-              <div className={`hidden md:flex w-12 h-12 rounded-full bg-gradient-to-r ${
-                isDark ? "from-green-500 to-cyan-600" : "from-green-600 to-cyan-700"
-              } flex items-center justify-center relative z-10 border-4 ${
-                isDark ? "border-slate-900" : "border-white"
-              } mx-4 shadow-lg ${
-                isDark ? "shadow-green-500/20" : "shadow-green-500/30"
-              }`}>
+              <div
+                className={`hidden md:flex w-12 h-12 rounded-full bg-gradient-to-r ${
+                  isDark
+                    ? "from-green-500 to-cyan-600"
+                    : "from-green-600 to-cyan-700"
+                } flex items-center justify-center relative z-10 border-4 ${
+                  isDark ? "border-slate-900" : "border-white"
+                } mx-4 shadow-lg ${
+                  isDark ? "shadow-green-500/20" : "shadow-green-500/30"
+                }`}
+              >
                 <div className="w-3 h-3 rounded-full bg-white"></div>
               </div>
 
@@ -475,7 +526,9 @@ const LeadershipSection = () => {
   ];
 
   return (
-    <section className={`relative w-full min-h-screen flex items-center justify-center py-20 ${sectionBg}`}>
+    <section
+      className={`relative w-full min-h-screen flex items-center justify-center py-20 ${sectionBg}`} id="team"
+    >
       <div className="relative z-10 px-4 max-w-6xl mx-auto">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-center mb-16 ${titleColor}`}
@@ -485,9 +538,13 @@ const LeadershipSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           Leadership{" "}
-          <span className={`bg-gradient-to-r ${
-            isDark ? "from-orange-400 to-pink-400" : "from-orange-600 to-pink-600"
-          } bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${
+              isDark
+                ? "from-orange-400 to-pink-400"
+                : "from-orange-600 to-pink-600"
+            } bg-clip-text text-transparent`}
+          >
             Team
           </span>
         </motion.h2>
@@ -502,29 +559,45 @@ const LeadershipSection = () => {
               viewport={{ once: true, margin: "-100px" }}
               className={`rounded-2xl overflow-hidden border transition-all duration-300 hover:shadow-lg ${cardBg}`}
             >
-              <div className={`h-48 bg-gradient-to-r ${
-                isDark ? "from-orange-900/20 to-pink-900/20" : "from-orange-100 to-pink-100"
-              } relative overflow-hidden flex items-center justify-center`}>
-                <div className={`text-6xl ${
-                  isDark ? "text-orange-400/30" : "text-orange-600/30"
-                }`}>
+              <div
+                className={`h-48 bg-gradient-to-r ${
+                  isDark
+                    ? "from-orange-900/20 to-pink-900/20"
+                    : "from-orange-100 to-pink-100"
+                } relative overflow-hidden flex items-center justify-center`}
+              >
+                <div
+                  className={`text-6xl ${
+                    isDark ? "text-orange-400/30" : "text-orange-600/30"
+                  }`}
+                >
                   {member.name.split(" ")[0].charAt(0)}
                   {member.name.split(" ")[1].charAt(0)}
                 </div>
               </div>
               <div className="p-6">
-                <h3 className={`text-2xl font-bold mb-2 ${titleColor}`}>{member.name}</h3>
+                <h3 className={`text-2xl font-bold mb-2 ${titleColor}`}>
+                  {member.name}
+                </h3>
                 <p className={`mb-4 ${accentColor}`}>{member.role}</p>
                 <p className={textColor}>{member.bio}</p>
                 <div className="flex mt-4 space-x-3">
-                  <button className={`text-sm transition-colors ${
-                    isDark ? "text-orange-400 hover:text-orange-300" : "text-orange-600 hover:text-orange-500"
-                  }`}>
+                  <button
+                    className={`text-sm transition-colors ${
+                      isDark
+                        ? "text-orange-400 hover:text-orange-300"
+                        : "text-orange-600 hover:text-orange-500"
+                    }`}
+                  >
                     LinkedIn
                   </button>
-                  <button className={`text-sm transition-colors ${
-                    isDark ? "text-orange-400 hover:text-orange-300" : "text-orange-600 hover:text-orange-500"
-                  }`}>
+                  <button
+                    className={`text-sm transition-colors ${
+                      isDark
+                        ? "text-orange-400 hover:text-orange-300"
+                        : "text-orange-600 hover:text-orange-500"
+                    }`}
+                  >
                     Full Bio
                   </button>
                 </div>
@@ -541,8 +614,9 @@ const LeadershipSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           <p className={`text-xl max-w-3xl mx-auto mb-8 ${textColor}`}>
-            Our leadership team brings together faculty expertise and student passion 
-            to create an environment where innovation thrives and entrepreneurial dreams take flight.
+            Our leadership team brings together faculty expertise and student
+            passion to create an environment where innovation thrives and
+            entrepreneurial dreams take flight.
           </p>
         </motion.div>
       </div>

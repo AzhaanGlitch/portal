@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,8 @@ import {
   ChevronRightIcon, 
   ArrowRightIcon,
   XIcon,
-  MenuIcon
+  MenuIcon,
+  CheckCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -42,6 +44,10 @@ type Event = {
   admin: { id: number; username: string };
 };
 
+interface EventParticipation {
+  is_participating: boolean;
+}
+
 interface EventFilters {
   search: string;
   status: "all" | "upcoming" | "ongoing" | "past" | "registration-open";
@@ -51,7 +57,9 @@ interface EventFilters {
 
 export default function EventsListPage() {
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
+  const [eventParticipations, setEventParticipations] = useState<Record<number, EventParticipation>>({});
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<EventFilters>({
     search: "",
@@ -72,17 +80,35 @@ export default function EventsListPage() {
     try {
       setLoading(true);
       const response = await api.get("/events/list/");
-      // Ensure we have a proper array even if response.data is undefined
-      console.log(response.data)
-      setEvents(Array.isArray(response.data) ? response.data : []);
+      const eventsData = Array.isArray(response.data) ? response.data : [];
+      setEvents(eventsData);
+
+      // Check participation for each event
+      await checkEventParticipations(eventsData);
     } catch (err: any) {
       toast.error("Failed to load events", {
         description: err?.response?.data?.message || "Please try again later",
       });
-      setEvents([]); // Set empty array on error
+      setEvents([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkEventParticipations = async (eventsData: Event[]) => {
+    const participationMap: Record<number, EventParticipation> = {};
+    
+    for (const event of eventsData) {
+      try {
+        const participationResponse = await api.get<EventParticipation>(`/events/events/${event.id}/participants/me/`);
+        participationMap[event.id] = participationResponse.data;
+      } catch (error) {
+        // If endpoint returns 404 or error, user is not participating
+        participationMap[event.id] = { is_participating: false };
+      }
+    }
+    
+    setEventParticipations(participationMap);
   };
 
   // Safe value getter with defaults
@@ -249,6 +275,20 @@ export default function EventsListPage() {
 
   const getSafeLocation = (event: Event) => {
     return event?.location || "Online";
+  };
+
+  // Check if user is registered for an event
+  const isUserRegistered = (eventId: number): boolean => {
+    return eventParticipations[eventId]?.is_participating || false;
+  };
+
+  // Check if registration is open for an event
+  const canRegister = (event: Event): boolean => {
+    try {
+      return new Date(event.reg_end_date) >= new Date();
+    } catch {
+      return false;
+    }
   };
 
   // Filter component to avoid duplication
@@ -546,15 +586,8 @@ export default function EventsListPage() {
                   {currentEvents.map((event) => {
                     if (!event) return null;
 
-                    const canRegister = () => {
-                      try {
-                        return new Date(event.reg_end_date) >= new Date();
-                      } catch {
-                        return false;
-                      }
-                    };
-
-                    const isParticipating = false; // Replace with actual user check
+                    const userRegistered = isUserRegistered(event.id);
+                    const registrationOpen = canRegister(event);
 
                     return (
                       <Card 
@@ -608,11 +641,12 @@ export default function EventsListPage() {
                             </div>
                             
                             <div className="flex items-center gap-2">
-                              {isParticipating ? (
-                                <Badge variant="default" className="bg-green-100 text-green-800">
+                              {userRegistered ? (
+                                <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
                                   Registered
                                 </Badge>
-                              ) : canRegister() ? (
+                              ) : registrationOpen ? (
                                 <Button 
                                   size="sm"
                                   onClick={(e) => handleRegisterClick(event.id, e)}

@@ -3,14 +3,21 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-// import Timeline  from "react-timeline-component";
-
+import Link from "next/link";
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
 import LiquidEther from "../animations/LiquidEther/LiquidEther";
 import { useTheme } from "next-themes";
 import HistorySection from "./HistorySection";
+import EventsSection from "./EventSection";
+
+const scrollToSection = (id: string) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth" });
+  }
+};
 export default function HomePage() {
   const [currentSection, setCurrentSection] = useState(0);
   const isScrolling = useRef(false);
@@ -183,21 +190,23 @@ export const HeroSection = () => {
                   ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
                   : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
               }`}
+              onClick={() => scrollToSection("explore")}
             >
               Explore I2EDC
             </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-8 py-4 rounded-lg font-semibold border transition-all duration-300 ${
-                isDark
-                  ? "bg-transparent text-white border-white/30 hover:bg-white/10"
-                  : "bg-transparent text-gray-800 border-gray-400 hover:bg-gray-100/50"
-              }`}
-            >
-              Join Community
-            </motion.button>
+            <Link href="/auth" scroll={false}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-8 py-4 rounded-lg font-semibold border transition-all duration-300 ${
+                  isDark
+                    ? "bg-transparent text-white border-white/30 hover:bg-white/10"
+                    : "bg-transparent text-gray-800 border-gray-400 hover:bg-gray-100/50"
+                }`}
+              >
+                Join Community
+              </motion.button>
+            </Link>
           </motion.div>
         </motion.div>
       </div>
@@ -326,6 +335,7 @@ const AboutSection = () => {
   return (
     <section
       className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}
+      id="explore"
     >
       <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
         <motion.h2
@@ -369,214 +379,6 @@ const AboutSection = () => {
             </motion.div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-};
-
-
-const EventsSection = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-  // Data for EventsSection
-  const eventsData = {
-    title: "Upcoming Events",
-    events: [
-      {
-        title: "Innovation Conference 2024",
-        description:
-          "A gathering of innovations, entrepreneurs, and industry experts.",
-        date: "Coming Soon",
-        link: "/events/innovation-conference-2024",
-        icon: (
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        ),
-      },
-      {
-        title: "3D Printing Workshop",
-        description:
-          "Learn the basics of 3D printing and create your own designs.",
-        date: "Coming Soon",
-        link: "/events/3d-printing-workshop",
-        icon: (
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
-            />
-          </svg>
-        ),
-      },
-      {
-        title: "Startup Networking Mixer",
-        description:
-          "Connect with fellow entrepreneurs and potential investors.",
-        date: "Coming Soon",
-        link: "/events/startup-networking-mixer",
-        icon: (
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-        ),
-      },
-    ],
-  };
-
-  // Theme-based styles
-  const sectionBg = isDark
-    ? "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-    : "bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50";
-
-  const titleColor = isDark ? "text-white" : "text-gray-900";
-  const subtitleGradient = isDark
-    ? "from-purple-400 to-pink-400"
-    : "from-purple-600 to-pink-600";
-
-  const cardBg = isDark
-    ? "bg-white/5 backdrop-blur-sm border-white/10 hover:border-white/20"
-    : "bg-white/80 backdrop-blur-sm border-gray-200 hover:border-gray-300";
-
-  const eventTitleColor = isDark ? "text-white" : "text-gray-900";
-  const eventDescriptionColor = isDark ? "text-gray-300" : "text-gray-700";
-  const dateColor = isDark ? "text-purple-400" : "text-purple-600";
-  const buttonColor = isDark
-    ? "text-white hover:text-purple-400"
-    : "text-gray-700 hover:text-purple-600";
-
-  const iconGradient = isDark
-    ? "from-purple-500 to-pink-500"
-    : "from-purple-600 to-pink-600";
-
-  return (
-    <section
-      className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}
-    >
-      <div className="relative z-10 px-6 max-w-6xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className={`text-4xl md:text-5xl font-bold ${titleColor} mb-12 text-center`}
-        >
-          {eventsData.title.split(" ")[0]}{" "}
-          <span
-            className={`text-transparent bg-gradient-to-r ${subtitleGradient} bg-clip-text`}
-          >
-            {eventsData.title.split(" ")[1]}
-          </span>
-        </motion.h2>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {eventsData.events.map((event, index) => (
-            <motion.div
-              key={event.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className={`rounded-2xl p-8 border transition-all duration-300 group hover:shadow-lg ${cardBg}`}
-            >
-              <div
-                className={`w-12 h-12 rounded-lg bg-gradient-to-r ${iconGradient} mb-6 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-              >
-                {event.icon}
-              </div>
-
-              <h3 className={`text-xl font-bold ${eventTitleColor} mb-3`}>
-                {event.title}
-              </h3>
-
-              <p className={`mb-4 leading-relaxed ${eventDescriptionColor}`}>
-                {event.description}
-              </p>
-
-              <div className="flex items-center justify-between">
-                <span className={`font-semibold ${dateColor}`}>
-                  {event.date}
-                </span>
-                <a
-                  href={event.link}
-                  className={`transition-colors duration-300 flex items-center gap-1 ${buttonColor}`}
-                >
-                  Learn More
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </a>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Call to action */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="/events"
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-              isDark
-                ? "bg-white/10 text-white border border-white/20 hover:bg-white/20"
-                : "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200"
-            }`}
-          >
-            View All Events
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </a>
-        </motion.div>
       </div>
     </section>
   );

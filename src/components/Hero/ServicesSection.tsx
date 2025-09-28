@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-
+import Link from "next/link";
 const ServicesSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { theme } = useTheme();
@@ -187,35 +187,38 @@ const ServicesSection = () => {
           transition={{ duration: 0.6, delay: 0.8 }}
           className={`backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto ${ctaBg}`}
         >
-          <h3 className={`text-2xl md:text-3xl font-bold mb-4 ${ctaTitleColor}`}>
+          <h3
+            className={`text-2xl md:text-3xl font-bold mb-4 ${ctaTitleColor}`}
+          >
             Ready to Bring Your Ideas to Life?
           </h3>
           <p className={`mb-6 ${ctaDescColor}`}>
             Get a free consultation and quote for your project today
           </p>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-medium 
+          <Link href={"/pages/contact#form"}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-medium 
                      shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 
                      border border-cyan-400/30 flex items-center gap-2 mx-auto"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-              />
-            </svg>
-            Get a Free Quote
-          </motion.button>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                />
+              </svg>
+              Get a Free Quote
+            </motion.button>
+          </Link>
         </motion.div>
       </div>
     </section>
