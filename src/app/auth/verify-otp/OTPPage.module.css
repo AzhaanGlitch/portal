@@ -125,7 +125,7 @@ body {
     margin: 15px 0;
 }
 
-.container button {
+.container .button {
     border-radius: 20px;
     border: 1px solid var(--bkcolor);
     background-color: var(--bkcolor);
@@ -138,15 +138,15 @@ body {
     transition: transform 80ms ease-in;
 }
 
-.container button:active {
+.container .button:active {
     transform: scale(0.95);
 }
 
-.container button:focus {
+.container .button:focus {
     outline: none;
 }
 
-.container button.ghost {
+.container .button.ghost {
     background-color: transparent;
     border-color: #FFFFFF;
 }
@@ -182,7 +182,7 @@ body {
         0 10px 10px rgba(0, 0, 0, 0.22);
     overflow: hidden;
     width: 40%;
-    max-width: 100%;
+    max-width: 700px;
     min-height: 480px;
     z-index: 2;
 
@@ -190,8 +190,9 @@ body {
 
 .formContainer {
     position: absolute;
-    top: 0;
+    inset: 0;
     height: 100%;
+    margin: auto;
     transition: all 0.6s ease-in-out;
 }
 
@@ -335,14 +336,14 @@ body {
     margin: 12px 0;
 }
 
-.chng button {
+.chng .button {
     font-size: 10px;
     padding: 6px 15px;
     border: 1px solid #7f7f7f !important;
     color: #7f7f7f;
 }
 
-.chng button:hover {
+.chng .button:hover {
     border-color: rgb(255, 255, 255) !important;
     color: #fff;
 }

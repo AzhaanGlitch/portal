@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode; }
           enableSystem={false}
           themes={['light', 'dark']}
         >
-
+          <Toaster richColors position="bottom-right" />
           <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>
       </body>

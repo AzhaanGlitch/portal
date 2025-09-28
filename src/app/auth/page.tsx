@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useState, useEffect, useCallback, memo, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner'
 import api from '@/lib/api';
 import styles from './auth.module.css';
 
@@ -49,8 +50,6 @@ export default function AuthPage() {
         signUp: { username: '', email: '', password: '', first_name: '', last_name: '' },
         signIn: { email: '', password: '' },
     });
-    
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Toggle between login and signup and update URL
@@ -96,49 +95,57 @@ export default function AuthPage() {
     const handleFormSubmit = useCallback(async (e: FormEvent, type: 'signUp' | 'signIn') => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+
+        console.log("Form submission triggered for:", type);
 
         try {
             if (type === 'signUp') {
-                // Sign-up logic with api
-                const response = await api.post(`/accounts/signup/`, authData.signUp)
-                console.log("otp", response.data.otp);
-                localStorage.setItem('i2dcUsername@#12', response.data?.username || " ");
-                
-                if (response.status === 200 || response.status === 201) {
-                    router.push('/auth/verify-otp');
-                    // if (true) {
-                    //     window.alert("Your account has been created successfully. Please log in.");
+                // Sign-up logic
+                console.log("Sign-up process starting");
+                const response = await api.post('/accounts/signup/', authData.signUp);
+                console.log("Sign-up API response received");
 
-                    // } else {
-                    //     setError('Sign-in after sign-up failed');
-                    // }
+                // Store username safely
+                const username = response.data?.username || " ";
+                localStorage.setItem('i2dcUsername@#12', username);
+                console.log("Username stored:", username);
+
+                if (response.status === 200 || response.status === 201) {
+                    // Clear form data
                     authData.signUp.first_name = '';
                     authData.signUp.last_name = '';
                     authData.signUp.email = '';
                     authData.signUp.password = '';
                     authData.signUp.username = '';
-                    setIsRightPanelActive(true);
-                    router.push('/auth?action=login');
+
+                    // Navigate and show success message
+                    router.push('/auth/verify-otp');
+                    toast.success('Your account has been created successfully.\nPlease verify your email');
                 } else {
-                    setError(response.data?.error || 'Sign-up failed');
+                    throw new Error(response.data?.error || "Sign-up failed");
                 }
+
             } else {
-                // Sign-in logic with Axios
+                // Sign-in logic
+                console.log("Sign-in process starting");
                 const response = await api.post('/accounts/login/', authData.signIn);
+                console.log("Sign-in API response received");
 
                 if (response.status === 200) {
                     router.push('/');
+                    toast.success('Welcome back!');
                 } else {
-                    setError(response.data?.error || 'Sign-in failed');
+                    throw new Error(response.data?.error || 'Sign-in failed');
                 }
             }
-        } catch (error: unknown) {
-            if (axios.isAxiosError(error)) {
-                setError(error.response?.data?.error || `Something went wrong during ${type === 'signUp' ? 'sign-up' : 'sign-in'}.`);
-            } else {
-                setError(`Something went wrong during ${type === 'signUp' ? 'sign-up' : 'sign-in'}.`);
-            }
+        } catch (error: any) {
+            console.error(`${type} error:`, error);
+
+            const errorMessage = error.response?.data?.error ||
+                error.message ||
+                `${type === 'signUp' ? 'Sign-up' : 'Sign-in'} failed`;
+            toast.error(errorMessage);
+            
         } finally {
             setLoading(false);
         }
@@ -157,7 +164,6 @@ export default function AuthPage() {
                     <div className={`${styles.formContainer} ${styles.signUpContainer}`}>
                         <form onSubmit={(e) => handleFormSubmit(e, 'signUp')}>
                             <h1>Create Account</h1>
-                            {error && isRightPanelActive && <p className={styles.error}>{error}</p>}
                             <span>or use your email for registration</span>
                             <InputField
                                 type="text"
@@ -204,7 +210,6 @@ export default function AuthPage() {
                     <div className={`${styles.formContainer} ${styles.signInContainer}`}>
                         <form onSubmit={(e) => handleFormSubmit(e, 'signIn')}>
                             <h1>Log In</h1>
-                            {error && !isRightPanelActive && <p className={styles.error}>{error}</p>}
                             <span>or use your account</span>
                             <InputField
                                 type="email"
@@ -224,6 +229,7 @@ export default function AuthPage() {
                             <button type="submit" disabled={loading}>
                                 {loading ? 'Signing In...' : 'Sign In'}
                             </button>
+                            <a href="/auth/verify-otp" className='!text-xs' >Verify Your Account from here </a>
                             <div className={styles.changeTag}>
                                 <p>Don&lsquo;t have an account?</p>
                                 <button className={styles.ghost} onClick={() => togglePanel(isRightPanelActive ? false : true)}>
