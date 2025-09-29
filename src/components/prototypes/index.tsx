@@ -670,7 +670,7 @@ An AI-powered health monitoring system that provides personalized health recomme
               viewport={{ once: true, margin: "-100px" }}
             >
               <Card
-                className={`h-full transition-all duration-300 hover:shadow-xl cursor-pointer ${cardBg}`}
+                className={`h-full transition-all duration-300 hover:shadow-xl cursor-pointer pt-0 ${cardBg}`}
                 onClick={() => openOverlay(prototype)}
               >
                 {/* Project Image */}
