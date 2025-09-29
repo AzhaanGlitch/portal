@@ -159,7 +159,7 @@ const ServiceRequestsPage: React.FC = () => {
   const fetchServiceRequests = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await api.get('/services/requests/admin/requests/');
+      const response = await api.get('/services/admin/requests/');
       // Filter requests for this specific service
       const serviceRequests = response.data.filter(
         (request: ServiceRequest) => request.service.id.toString() === serviceId
@@ -187,7 +187,7 @@ const ServiceRequestsPage: React.FC = () => {
 
     try {
       setUpdating(true);
-      await api.patch(`/services/requests/admin/requests/${selectedRequest.id}/update/`, {
+      await api.patch(`/services/admin/requests/${selectedRequest.id}/update/`, {
         status: newStatus,
         remark: remark || undefined
       });

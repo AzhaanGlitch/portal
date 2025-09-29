@@ -159,7 +159,7 @@ const AdminServicesPage: React.FC = () => {
   };
 
   const handleCardClick = (serviceId: number): void => {
-    router.push(`/pages/admin/services/${serviceId}`);
+    router.push(`/pages/admin/services/${serviceId}/requests`);
   };
 
   const filteredServices = services.filter(service =>
@@ -256,7 +256,7 @@ const AdminServicesPage: React.FC = () => {
                         View Details
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    {/* <DropdownMenuItem asChild>
                       <Link 
                         href={`/pages/admin/services/${service.id}/edit`} 
                         className="cursor-pointer flex items-center"
@@ -265,7 +265,7 @@ const AdminServicesPage: React.FC = () => {
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Service
                       </Link>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={(e) => {
