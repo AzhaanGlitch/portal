@@ -6,7 +6,7 @@ const tabs = [
     { name: "Media", href: "media" },
     { name: "Feedback", href: "feedback" },
     { name: "Assign Access", href: "access" },
-    { name: "Modules", href: "modules" },
+    // { name: "Modules", href: "modules" },
     { name: "Services", href: "services" },
     { name: "Events", href: "events" },
 ];
