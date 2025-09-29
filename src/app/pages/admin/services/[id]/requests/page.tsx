@@ -1,31 +1,31 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import api from '@/lib/api';
+"use client";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 // Shadcn components
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -33,20 +33,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  MoreHorizontal, 
-  Search, 
-  Edit, 
-  Trash2, 
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  MoreHorizontal,
+  Search,
+  Edit,
+  Trash2,
   Eye,
   ArrowLeft,
   Filter,
@@ -59,8 +59,8 @@ import {
   AlertCircle,
   RefreshCw,
   Download,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 
 // Type definitions
 interface User {
@@ -94,7 +94,7 @@ interface ServiceRequest {
     discount: number;
     description?: string;
   };
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   request_msg: {
     subject: string;
     body: string;
@@ -118,7 +118,12 @@ interface ServiceStatistics {
   }>;
 }
 
-type StatusFilter = 'all' | 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+type StatusFilter =
+  | "all"
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
 const ServiceRequestsPage: React.FC = () => {
   const router = useRouter();
@@ -129,13 +134,15 @@ const ServiceRequestsPage: React.FC = () => {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [stats, setStats] = useState<ServiceStatistics | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [updateDialogOpen, setUpdateDialogOpen] = useState<boolean>(false);
-  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(
+    null
+  );
   const [updating, setUpdating] = useState<boolean>(false);
-  const [remark, setRemark] = useState<string>('');
-  const [newStatus, setNewStatus] = useState<string>('');
+  const [remark, setRemark] = useState<string>("");
+  const [newStatus, setNewStatus] = useState<string>("");
 
   // Fetch service details and requests on component mount
   useEffect(() => {
@@ -151,23 +158,23 @@ const ServiceRequestsPage: React.FC = () => {
       const response = await api.get(`/services/${serviceId}/`);
       setService(response.data);
     } catch (error: unknown) {
-      console.error('Error fetching service details:', error);
-      toast.error('Failed to load service details');
+      console.error("Error fetching service details:", error);
+      toast.error("Failed to load service details");
     }
   };
 
   const fetchServiceRequests = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await api.get('/services/admin/requests/');
+      const response = await api.get("/services/admin/requests/");
       // Filter requests for this specific service
       const serviceRequests = response.data.filter(
         (request: ServiceRequest) => request.service.id.toString() === serviceId
       );
       setRequests(serviceRequests);
     } catch (error: unknown) {
-      console.error('Error fetching service requests:', error);
-      toast.error('Failed to load service requests');
+      console.error("Error fetching service requests:", error);
+      toast.error("Failed to load service requests");
     } finally {
       setLoading(false);
     }
@@ -178,7 +185,7 @@ const ServiceRequestsPage: React.FC = () => {
       const response = await api.get(`/services/${serviceId}/statistics/`);
       setStats(response.data);
     } catch (error: unknown) {
-      console.error('Error fetching service stats:', error);
+      console.error("Error fetching service stats:", error);
     }
   };
 
@@ -187,23 +194,26 @@ const ServiceRequestsPage: React.FC = () => {
 
     try {
       setUpdating(true);
-      await api.patch(`/services/admin/requests/${selectedRequest.id}/update/`, {
-        status: newStatus,
-        remark: remark || undefined
-      });
-      
-      toast.success('Request status updated successfully');
+      await api.patch(
+        `/services/admin/requests/${selectedRequest.id}/update/`,
+        {
+          status: newStatus,
+          remark: remark || undefined,
+        }
+      );
+
+      toast.success("Request status updated successfully");
       setUpdateDialogOpen(false);
       setSelectedRequest(null);
-      setRemark('');
-      setNewStatus('');
-      
+      setRemark("");
+      setNewStatus("");
+
       // Refresh data
       fetchServiceRequests();
       fetchServiceStats();
     } catch (error: unknown) {
-      console.error('Error updating request status:', error);
-      toast.error('Failed to update request status');
+      console.error("Error updating request status:", error);
+      toast.error("Failed to update request status");
     } finally {
       setUpdating(false);
     }
@@ -212,48 +222,77 @@ const ServiceRequestsPage: React.FC = () => {
   const handleUpdateClick = (request: ServiceRequest): void => {
     setSelectedRequest(request);
     setNewStatus(request.status);
-    setRemark(request.remark || '');
+    setRemark(request.remark || "");
     setUpdateDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      PENDING: { variant: 'secondary' as const, icon: Clock, color: 'text-yellow-600' },
-      IN_PROGRESS: { variant: 'default' as const, icon: RefreshCw, color: 'text-blue-600' },
-      COMPLETED: { variant: 'default' as const, icon: CheckCircle, color: 'text-green-600' },
-      CANCELLED: { variant: 'destructive' as const, icon: XCircle, color: 'text-red-600' }
+      PENDING: {
+        variant: "secondary" as const,
+        icon: Clock,
+        color: "text-yellow-600",
+      },
+      IN_PROGRESS: {
+        variant: "default" as const,
+        icon: RefreshCw,
+        color: "text-blue-600",
+      },
+      COMPLETED: {
+        variant: "default" as const,
+        icon: CheckCircle,
+        color: "text-green-600",
+      },
+      CANCELLED: {
+        variant: "destructive" as const,
+        icon: XCircle,
+        color: "text-red-600",
+      },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const IconComponent = config.icon;
 
     return (
-      <Badge variant={config.variant} className="flex items-center space-x-1 w-fit">
+      <Badge
+        variant={config.variant}
+        className="flex items-center space-x-1 w-fit"
+      >
         <IconComponent className={`h-3 w-3 ${config.color}`} />
-        <span className="capitalize">{status.toLowerCase().replace('_', ' ')}</span>
+        <span className="capitalize">
+          {status.toLowerCase().replace("_", " ")}
+        </span>
       </Badge>
     );
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  const filteredRequests = requests.filter(request => {
-    const matchesSearch = 
-      request.requested_by.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.requested_by.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.request_msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredRequests = requests.filter((request) => {
+    const matchesSearch =
+      request.requested_by.username
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.requested_by.email
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      request.request_msg.subject
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       request.plan.plan.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === "all" || request.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -272,7 +311,9 @@ const ServiceRequestsPage: React.FC = () => {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-lg font-medium">Loading service requests...</p>
-              <p className="text-muted-foreground text-sm mt-2">Please wait while we fetch the data</p>
+              <p className="text-muted-foreground text-sm mt-2">
+                Please wait while we fetch the data
+              </p>
             </div>
           </div>
         </div>
@@ -297,9 +338,7 @@ const ServiceRequestsPage: React.FC = () => {
                 <span>Back</span>
               </Button>
               <div className="flex-1">
-                <h1 className="text-4xl font-bold">
-                  Service Requests
-                </h1>
+                <h1 className="text-4xl font-bold">Service Requests</h1>
                 {service && (
                   <p className="text-lg text-muted-foreground">
                     Managing requests for <strong>{service.name}</strong>
@@ -308,9 +347,13 @@ const ServiceRequestsPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
               <Download className="h-4 w-4" />
               <span>Export</span>
             </Button>
@@ -330,7 +373,9 @@ const ServiceRequestsPage: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Requests</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Total Requests
+                    </p>
                     <p className="text-2xl font-bold">{stats.total_requests}</p>
                   </div>
                   <div className="p-3 bg-primary/10 rounded-xl">
@@ -339,13 +384,17 @@ const ServiceRequestsPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                    <p className="text-2xl font-bold">{stats.pending_requests}</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Pending
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {stats.pending_requests}
+                    </p>
                   </div>
                   <div className="p-3 bg-yellow-100 dark:bg-yellow-950 rounded-xl">
                     <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
@@ -353,13 +402,17 @@ const ServiceRequestsPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                    <p className="text-2xl font-bold">{stats.completed_requests}</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Completed
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {stats.completed_requests}
+                    </p>
                   </div>
                   <div className="p-3 bg-green-100 dark:bg-green-950 rounded-xl">
                     <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -367,14 +420,16 @@ const ServiceRequestsPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Popular Plan</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Popular Plan
+                    </p>
                     <p className="text-2xl font-bold capitalize">
-                      {stats.popular_plans?.[0]?.plan__plan || 'N/A'}
+                      {stats.popular_plans?.[0]?.plan__plan || "N/A"}
                     </p>
                   </div>
                   <div className="p-3 bg-purple-100 dark:bg-purple-950 rounded-xl">
@@ -396,14 +451,21 @@ const ServiceRequestsPage: React.FC = () => {
                   <Input
                     placeholder="Search by user, email, subject, or plan..."
                     value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchTerm(e.target.value)
+                    }
                     className="pl-10"
                   />
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <Filter className="h-4 w-4 text-muted-foreground" />
-                  <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(value: StatusFilter) =>
+                      setStatusFilter(value)
+                    }
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>
@@ -417,9 +479,11 @@ const ServiceRequestsPage: React.FC = () => {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
-                <span className="font-medium">{filteredRequests.length}</span> of <span className="font-medium">{requests.length}</span> requests
+                <span className="font-medium">{filteredRequests.length}</span>{" "}
+                of <span className="font-medium">{requests.length}</span>{" "}
+                requests
               </div>
             </div>
           </CardContent>
@@ -433,13 +497,14 @@ const ServiceRequestsPage: React.FC = () => {
                 <AlertCircle className="h-12 w-12 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-3">
-                {searchTerm || statusFilter !== 'all' ? 'No requests found' : 'No requests yet'}
+                {searchTerm || statusFilter !== "all"
+                  ? "No requests found"
+                  : "No requests yet"}
               </h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg">
-                {searchTerm || statusFilter !== 'all' 
-                  ? 'No requests match your current filters. Try adjusting your search criteria.'
-                  : 'This service has not received any requests yet. Requests will appear here once users start placing orders.'
-                }
+                {searchTerm || statusFilter !== "all"
+                  ? "No requests match your current filters. Try adjusting your search criteria."
+                  : "This service has not received any requests yet. Requests will appear here once users start placing orders."}
               </p>
             </CardContent>
           </Card>
@@ -468,9 +533,12 @@ const ServiceRequestsPage: React.FC = () => {
                           </div>
                           <div>
                             <p className="font-medium">
-                              {request.requested_by.first_name} {request.requested_by.last_name}
+                              {request.requested_by.first_name}{" "}
+                              {request.requested_by.last_name}
                             </p>
-                            <p className="text-sm text-muted-foreground">{request.requested_by.email}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {request.requested_by.email}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
@@ -492,29 +560,29 @@ const ServiceRequestsPage: React.FC = () => {
                       <TableCell className="font-semibold text-green-600">
                         {getPlanCost(request)}
                       </TableCell>
-                      <TableCell>
-                        {getStatusBadge(request.status)}
-                      </TableCell>
+                      <TableCell>{getStatusBadge(request.status)}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDate(request.requested_at)}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="h-8 w-8 p-0"
                             onClick={() => handleUpdateClick(request)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            asChild 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
                             className="h-8 w-8 p-0"
                           >
-                            <Link href={`/pages/admin/requests/${request.id}`}>
+                            <Link
+                              href={`/pages/admin/services/${service?.id}/requests/${request.id}`}
+                            >
                               <Eye className="h-4 w-4" />
                             </Link>
                           </Button>
@@ -547,15 +615,21 @@ const ServiceRequestsPage: React.FC = () => {
                 <div className="bg-muted rounded-lg p-4 space-y-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium">{selectedRequest.request_msg.subject}</p>
+                      <p className="font-medium">
+                        {selectedRequest.request_msg.subject}
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        by {selectedRequest.requested_by.first_name} {selectedRequest.requested_by.last_name}
+                        by {selectedRequest.requested_by.first_name}{" "}
+                        {selectedRequest.requested_by.last_name}
                       </p>
                     </div>
                     {getStatusBadge(selectedRequest.status)}
                   </div>
                   <p className="text-sm">
-                    Plan: <Badge variant="outline" className="capitalize">{selectedRequest.plan.plan}</Badge>
+                    Plan:{" "}
+                    <Badge variant="outline" className="capitalize">
+                      {selectedRequest.plan.plan}
+                    </Badge>
                   </p>
                 </div>
 
@@ -577,11 +651,15 @@ const ServiceRequestsPage: React.FC = () => {
 
                 {/* Remark Textarea */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Remarks (Optional)</label>
+                  <label className="text-sm font-medium">
+                    Remarks (Optional)
+                  </label>
                   <Textarea
                     placeholder="Add any remarks or notes about this request..."
                     value={remark}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRemark(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      setRemark(e.target.value)
+                    }
                     rows={3}
                   />
                 </div>
@@ -608,7 +686,7 @@ const ServiceRequestsPage: React.FC = () => {
                     Updating...
                   </>
                 ) : (
-                  'Update Status'
+                  "Update Status"
                 )}
               </Button>
             </DialogFooter>
