@@ -1,31 +1,38 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
+"use client";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 // Shadcn components
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -33,13 +40,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { 
-  MoreHorizontal, 
-  Plus, 
-  Search, 
-  Edit, 
-  Trash2, 
+} from "@/components/ui/dialog";
+import {
+  MoreHorizontal,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
   Eye,
   Calendar,
   DollarSign,
@@ -49,8 +56,8 @@ import {
   Clock,
   Filter,
   LayoutGrid,
-  Table as TableIcon
-} from 'lucide-react';
+  Table as TableIcon,
+} from "lucide-react";
 
 // Type definitions
 interface Service {
@@ -86,19 +93,19 @@ interface ServiceStats {
   }>;
 }
 
-type ViewMode = 'grid' | 'table';
+type ViewMode = "grid" | "table";
 
 const AdminServicesPage: React.FC = () => {
   const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
   const [deleting, setDeleting] = useState<boolean>(false);
   const [stats, setStats] = useState<{ [key: number]: ServiceStats }>({});
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Fetch services on component mount
   useEffect(() => {
@@ -108,16 +115,16 @@ const AdminServicesPage: React.FC = () => {
   const fetchServices = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await api.get('/services/admin/my-services/');
+      const response = await api.get("/services/admin/my-services/");
       setServices(response.data);
-      
+
       // Fetch stats for each service
       response.data.forEach((service: Service) => {
         fetchServiceStats(service.id);
       });
     } catch (error: unknown) {
-      console.error('Error fetching services:', error);
-      toast.error('Failed to load services');
+      console.error("Error fetching services:", error);
+      toast.error("Failed to load services");
     } finally {
       setLoading(false);
     }
@@ -126,9 +133,9 @@ const AdminServicesPage: React.FC = () => {
   const fetchServiceStats = async (serviceId: number): Promise<void> => {
     try {
       const response = await api.get(`/services/${serviceId}/statistics/`);
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
-        [serviceId]: response.data
+        [serviceId]: response.data,
       }));
     } catch (error: unknown) {
       console.error(`Error fetching stats for service ${serviceId}:`, error);
@@ -146,13 +153,15 @@ const AdminServicesPage: React.FC = () => {
     try {
       setDeleting(true);
       await api.delete(`/services/${serviceToDelete.id}/delete/`);
-      toast.success('Service deleted successfully');
-      setServices(services.filter(service => service.id !== serviceToDelete.id));
+      toast.success("Service deleted successfully");
+      setServices(
+        services.filter((service) => service.id !== serviceToDelete.id)
+      );
       setDeleteDialogOpen(false);
       setServiceToDelete(null);
     } catch (error: unknown) {
-      console.error('Error deleting service:', error);
-      toast.error('Failed to delete service');
+      console.error("Error deleting service:", error);
+      toast.error("Failed to delete service");
     } finally {
       setDeleting(false);
     }
@@ -162,17 +171,18 @@ const AdminServicesPage: React.FC = () => {
     router.push(`/pages/admin/services/${serviceId}/requests`);
   };
 
-  const filteredServices = services.filter(service =>
-    service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredServices = services.filter(
+    (service) =>
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Format date
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -183,14 +193,14 @@ const AdminServicesPage: React.FC = () => {
 
   // Get lowest price from plans
   const getStartingPrice = (service: Service): string => {
-    if (!service.cost_discount?.length) return 'N/A';
-    
-    const prices = service.cost_discount.map(plan => {
+    if (!service.cost_discount?.length) return "N/A";
+
+    const prices = service.cost_discount.map((plan) => {
       const cost = plan.cost || 0;
       const discount = plan.discount || 0;
       return cost - discount;
     });
-    
+
     const minPrice = Math.min(...prices);
     return `$${minPrice.toFixed(2)}`;
   };
@@ -198,18 +208,19 @@ const AdminServicesPage: React.FC = () => {
   // Get completion rate
   const getCompletionRate = (serviceId: number): string => {
     const serviceStats = stats[serviceId];
-    if (!serviceStats?.total_requests) return '0%';
-    
-    const rate = (serviceStats.completed_requests / serviceStats.total_requests) * 100;
+    if (!serviceStats?.total_requests) return "0%";
+
+    const rate =
+      (serviceStats.completed_requests / serviceStats.total_requests) * 100;
     return `${Math.round(rate)}%`;
   };
 
   // Get most popular plan
   const getPopularPlan = (serviceId: number): string => {
     const serviceStats = stats[serviceId];
-    if (!serviceStats?.popular_plans?.length) return 'N/A';
-    
-    return serviceStats.popular_plans[0].plan__plan || 'N/A';
+    if (!serviceStats?.popular_plans?.length) return "N/A";
+
+    return serviceStats.popular_plans[0].plan__plan || "N/A";
   };
 
   // Card View Component
@@ -219,10 +230,10 @@ const AdminServicesPage: React.FC = () => {
         const serviceStats = stats[service.id];
         const completionRate = getCompletionRate(service.id);
         const popularPlan = getPopularPlan(service.id);
-        
+
         return (
-          <Card 
-            key={service.id} 
+          <Card
+            key={service.id}
             className="group hover:shadow-md transition-all duration-300 cursor-pointer"
             onClick={() => handleCardClick(service.id)}
           >
@@ -238,9 +249,9 @@ const AdminServicesPage: React.FC = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -251,23 +262,26 @@ const AdminServicesPage: React.FC = () => {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href={`/pages/admin/services/${service.id}`} className="cursor-pointer flex items-center">
+                      <Link
+                        href={`/pages/admin/services/${service.id}`}
+                        className="cursor-pointer flex items-center"
+                      >
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
                       </Link>
                     </DropdownMenuItem>
-                    {/* <DropdownMenuItem asChild>
-                      <Link 
-                        href={`/pages/admin/services/${service.id}/edit`} 
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/pages/admin/services/${service.id}`}
                         className="cursor-pointer flex items-center"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Service
                       </Link>
-                    </DropdownMenuItem> */}
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteClick(service);
@@ -281,7 +295,7 @@ const AdminServicesPage: React.FC = () => {
                 </DropdownMenu>
               </div>
             </CardHeader>
-            
+
             <CardContent className="pb-4">
               <div className="space-y-4">
                 {/* Pricing & Plans */}
@@ -291,11 +305,18 @@ const AdminServicesPage: React.FC = () => {
                       <DollarSign className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{getStartingPrice(service)}</p>
-                      <p className="text-xs text-muted-foreground">Starting price</p>
+                      <p className="text-sm font-medium">
+                        {getStartingPrice(service)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Starting price
+                      </p>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="flex items-center space-x-1">
+                  <Badge
+                    variant="secondary"
+                    className="flex items-center space-x-1"
+                  >
                     <Package className="h-3 w-3" />
                     <span>{getPlanCount(service)} plans</span>
                   </Badge>
@@ -306,21 +327,27 @@ const AdminServicesPage: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center space-x-1 text-sm">
                       <Users className="h-4 w-4 text-primary" />
-                      <span className="font-medium">{serviceStats?.total_requests || 0}</span>
+                      <span className="font-medium">
+                        {serviceStats?.total_requests || 0}
+                      </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">Total requests</p>
+                    <p className="text-xs text-muted-foreground">
+                      Total requests
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center space-x-1 text-sm">
                       <TrendingUp className="h-4 w-4 text-green-600" />
                       <span className="font-medium">{completionRate}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">Completion rate</p>
+                    <p className="text-xs text-muted-foreground">
+                      Completion rate
+                    </p>
                   </div>
                 </div>
 
                 {/* Popular Plan */}
-                {popularPlan !== 'N/A' && (
+                {popularPlan !== "N/A" && (
                   <div className="bg-muted rounded-lg p-3">
                     <div className="flex items-center space-x-2 text-sm">
                       <span className="font-medium">Most Popular:</span>
@@ -374,10 +401,10 @@ const AdminServicesPage: React.FC = () => {
             {filteredServices.map((service) => {
               const serviceStats = stats[service.id];
               const completionRate = getCompletionRate(service.id);
-              
+
               return (
-                <TableRow 
-                  key={service.id} 
+                <TableRow
+                  key={service.id}
                   className="group cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => handleCardClick(service.id)}
                 >
@@ -386,7 +413,9 @@ const AdminServicesPage: React.FC = () => {
                       <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                         <Package className="h-5 w-5 text-primary" />
                       </div>
-                      <span className="group-hover:text-primary transition-colors">{service.name}</span>
+                      <span className="group-hover:text-primary transition-colors">
+                        {service.name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -397,7 +426,10 @@ const AdminServicesPage: React.FC = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="flex items-center space-x-1 w-fit">
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center space-x-1 w-fit"
+                    >
                       <Package className="h-3 w-3" />
                       <span>{getPlanCount(service)}</span>
                     </Badge>
@@ -411,7 +443,10 @@ const AdminServicesPage: React.FC = () => {
                         </span>
                       </div>
                       {serviceStats?.pending_requests > 0 && (
-                        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800">
+                        <Badge
+                          variant="outline"
+                          className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800"
+                        >
                           {serviceStats.pending_requests} pending
                         </Badge>
                       )}
@@ -420,7 +455,7 @@ const AdminServicesPage: React.FC = () => {
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <div className="w-16 bg-secondary rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-green-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: getCompletionRate(service.id) }}
                         />
@@ -438,10 +473,10 @@ const AdminServicesPage: React.FC = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button 
-                        asChild 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
                         className="h-8 w-8 p-0"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -449,10 +484,10 @@ const AdminServicesPage: React.FC = () => {
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button 
-                        asChild 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
                         className="h-8 w-8 p-0"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -460,9 +495,9 @@ const AdminServicesPage: React.FC = () => {
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -490,7 +525,9 @@ const AdminServicesPage: React.FC = () => {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-lg font-medium">Loading services...</p>
-              <p className="text-muted-foreground text-sm mt-2">Please wait while we fetch your services</p>
+              <p className="text-muted-foreground text-sm mt-2">
+                Please wait while we fetch your services
+              </p>
             </div>
           </div>
         </div>
@@ -504,11 +541,10 @@ const AdminServicesPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold">
-              Services Management
-            </h1>
+            <h1 className="text-4xl font-bold">Services Management</h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              Manage all your services, pricing plans, and monitor performance metrics
+              Manage all your services, pricing plans, and monitor performance
+              metrics
             </p>
           </div>
           <Button asChild size="lg">
@@ -525,7 +561,9 @@ const AdminServicesPage: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Services</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Services
+                  </p>
                   <p className="text-2xl font-bold">{services.length}</p>
                 </div>
                 <div className="p-3 bg-primary/10 rounded-xl">
@@ -534,14 +572,19 @@ const AdminServicesPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Plans</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Plans
+                  </p>
                   <p className="text-2xl font-bold">
-                    {services.reduce((total, service) => total + getPlanCount(service), 0)}
+                    {services.reduce(
+                      (total, service) => total + getPlanCount(service),
+                      0
+                    )}
                   </p>
                 </div>
                 <div className="p-3 bg-green-100 dark:bg-green-950 rounded-xl">
@@ -550,14 +593,19 @@ const AdminServicesPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Requests</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Active Requests
+                  </p>
                   <p className="text-2xl font-bold">
-                    {Object.values(stats).reduce((total, stat) => total + (stat?.pending_requests || 0), 0)}
+                    {Object.values(stats).reduce(
+                      (total, stat) => total + (stat?.pending_requests || 0),
+                      0
+                    )}
                   </p>
                 </div>
                 <div className="p-3 bg-orange-100 dark:bg-orange-950 rounded-xl">
@@ -566,14 +614,19 @@ const AdminServicesPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Requests</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Requests
+                  </p>
                   <p className="text-2xl font-bold">
-                    {Object.values(stats).reduce((total, stat) => total + (stat?.total_requests || 0), 0)}
+                    {Object.values(stats).reduce(
+                      (total, stat) => total + (stat?.total_requests || 0),
+                      0
+                    )}
                   </p>
                 </div>
                 <div className="p-3 bg-purple-100 dark:bg-purple-950 rounded-xl">
@@ -594,14 +647,16 @@ const AdminServicesPage: React.FC = () => {
                   <Input
                     placeholder="Search services by name or description..."
                     value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setSearchTerm(e.target.value)
+                    }
                     className="pl-10"
                   />
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <Filter className="h-4 w-4 text-muted-foreground" />
-                  <select 
+                  <select
                     className="border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -612,29 +667,31 @@ const AdminServicesPage: React.FC = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-4 w-full lg:w-auto">
                 <div className="flex items-center space-x-1 bg-muted rounded-lg p-1">
                   <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    variant={viewMode === "grid" ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => setViewMode('grid')}
+                    onClick={() => setViewMode("grid")}
                     className="h-8 px-3"
                   >
                     <LayoutGrid className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant={viewMode === 'table' ? 'default' : 'ghost'}
+                    variant={viewMode === "table" ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => setViewMode('table')}
+                    onClick={() => setViewMode("table")}
                     className="h-8 px-3"
                   >
                     <TableIcon className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <div className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
-                  <span className="font-medium">{filteredServices.length}</span> of <span className="font-medium">{services.length}</span> services
+                  <span className="font-medium">{filteredServices.length}</span>{" "}
+                  of <span className="font-medium">{services.length}</span>{" "}
+                  services
                 </div>
               </div>
             </div>
@@ -649,13 +706,12 @@ const AdminServicesPage: React.FC = () => {
                 <Package className="h-12 w-12 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-3">
-                {searchTerm ? 'No services found' : 'No services created yet'}
+                {searchTerm ? "No services found" : "No services created yet"}
               </h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg">
-                {searchTerm 
+                {searchTerm
                   ? `No services match "${searchTerm}". Try adjusting your search terms or create a new service.`
-                  : 'Get started by creating your first service to offer to users. Create pricing plans and start accepting requests.'
-                }
+                  : "Get started by creating your first service to offer to users. Create pricing plans and start accepting requests."}
               </p>
               <Button asChild size="lg">
                 <Link href="/pages/admin/services/create">
@@ -665,7 +721,7 @@ const AdminServicesPage: React.FC = () => {
               </Button>
             </CardContent>
           </Card>
-        ) : viewMode === 'grid' ? (
+        ) : viewMode === "grid" ? (
           <ServiceCardsView />
         ) : (
           <ServiceTableView />
@@ -681,11 +737,15 @@ const AdminServicesPage: React.FC = () => {
               </DialogTitle>
               <DialogDescription className="pt-4">
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-4">
-                  <p className="text-destructive font-medium">This action cannot be undone</p>
+                  <p className="text-destructive font-medium">
+                    This action cannot be undone
+                  </p>
                 </div>
                 <p className="text-foreground">
-                  Are you sure you want to delete the service <strong>"{serviceToDelete?.name}"</strong>? 
-                  All associated data including pricing plans and request history will be permanently removed.
+                  Are you sure you want to delete the service{" "}
+                  <strong>"{serviceToDelete?.name}"</strong>? All associated
+                  data including pricing plans and request history will be
+                  permanently removed.
                 </p>
               </DialogDescription>
             </DialogHeader>
@@ -710,7 +770,7 @@ const AdminServicesPage: React.FC = () => {
                     Deleting...
                   </>
                 ) : (
-                  'Delete Service'
+                  "Delete Service"
                 )}
               </Button>
             </DialogFooter>

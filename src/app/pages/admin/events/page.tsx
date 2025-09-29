@@ -59,7 +59,7 @@ const EventLists = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/events/list/");
+      const response = await api.get("/events/admin-list/");
       setEvents(response.data);
      
     } catch (err: any) {

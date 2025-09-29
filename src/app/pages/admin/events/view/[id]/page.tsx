@@ -8,7 +8,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon, ClockIcon, UserIcon, CalendarDaysIcon, Loader2, UsersIcon, ArrowLeftIcon, EditIcon, SaveIcon, XIcon } from "lucide-react";
+import { 
+  CalendarIcon, 
+  ClockIcon, 
+  UserIcon, 
+  CalendarDaysIcon, 
+  Loader2, 
+  UsersIcon, 
+  ArrowLeftIcon, 
+  EditIcon, 
+  SaveIcon, 
+  XIcon,
+  DownloadIcon,
+  SearchIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -17,6 +32,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: number;
@@ -43,6 +67,15 @@ interface Event {
   updated_at?: string;
 }
 
+interface Participant {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  registered_at: string;
+}
+
 export default function ViewEventPage() {
   const params = useParams();
   const router = useRouter();
@@ -56,6 +89,13 @@ export default function ViewEventPage() {
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingStaff, setLoadingStaff] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Participants state
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Fetch event data and staff users
   useEffect(() => {
@@ -73,9 +113,12 @@ export default function ViewEventPage() {
         
         // Fetch event data
         const eventResponse = await api.get(`/events/retrieve/${eventId}/`);
-         console.log(eventResponse.data)
+        console.log(eventResponse.data)
         setEvent(eventResponse.data);
         setFormData(eventResponse.data);
+        
+        // Fetch participants
+        await fetchParticipants();
         
       } catch (err: any) {
         toast.error("Failed to load event data", {
@@ -92,6 +135,20 @@ export default function ViewEventPage() {
       fetchData();
     }
   }, [eventId, router]);
+
+  const fetchParticipants = async () => {
+    try {
+      setLoadingParticipants(true);
+      // Assuming you have an endpoint to get event participants
+      const response = await api.get(`/events/events/${eventId}/participants/`);
+      setParticipants(response.data);
+    } catch (err: any) {
+      console.error("Failed to fetch participants:", err);
+      toast.error("Failed to load participants");
+    } finally {
+      setLoadingParticipants(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -239,17 +296,81 @@ export default function ViewEventPage() {
     });
   };
 
+  // Download CSV functionality
+  const downloadCSV = () => {
+    if (participants.length === 0) {
+      toast.error("No participants to download");
+      return;
+    }
+
+    try {
+      // Create CSV headers
+      const headers = ['ID', 'First Name', 'Last Name', 'Username', 'Email', 'Registered At'];
+      
+      // Create CSV content
+      const csvContent = [
+        headers.join(','),
+        ...filteredParticipants.map(participant => [
+          participant.id,
+          `"${participant.first_name || ''}"`,
+          `"${participant.last_name || ''}"`,
+          `"${participant.username}"`,
+          `"${participant.email}"`,
+          `"${new Date(participant.registered_at).toLocaleString()}"`
+        ].join(','))
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `event-${event?.name}-participants.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("CSV downloaded successfully");
+    } catch (err) {
+      console.error("Failed to download CSV:", err);
+      toast.error("Failed to download CSV");
+    }
+  };
+
+  // Filter participants based on search term
+  const filteredParticipants = participants.filter(participant => 
+    participant.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    participant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    participant.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    participant.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredParticipants.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentParticipants = filteredParticipants.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Pagination handlers
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   // Get display name for user
   const getUserDisplayName = (user: User) => {
     if (user.first_name && user.last_name) {
       return `${user.first_name} ${user.last_name} (${user.username})`;
     }
     return user.username;
-  };
-
-  // Check if user is staff/superadmin
-  const isUserStaff = (user: User) => {
-    return user.is_staff || user.is_superadmin;
   };
 
   if (loadingEvent) {
@@ -279,9 +400,9 @@ export default function ViewEventPage() {
 
   return (
     <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header with Back Button */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between">
           <Button 
             variant="ghost" 
             onClick={() => router.push("/pages/admin/events")}
@@ -332,97 +453,38 @@ export default function ViewEventPage() {
           </div>
         </div>
 
-        <Card className="shadow-lg border-border">
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-              <CalendarDaysIcon className="w-6 h-6 text-primary" />
-            </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              {isEditing ? "Edit Event" : "View Event"}
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              {isEditing 
-                ? "Update the event details below" 
-                : `Created on ${new Date(event.created_at || '').toLocaleDateString()} • ${event.participants?.length || 0} participants`
-              }
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="pt-4">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Event Name */}
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">
-                  Event Name <span className="text-destructive">*</span>
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="Enter event name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                    disabled={!isEditing || loading}
-                  />
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Event Details Card */}
+          <div className="lg:col-span-2">
+            <Card className="shadow-lg border-border">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <CalendarDaysIcon className="w-6 h-6 text-primary" />
                 </div>
-              </div>
-
-              {/* Admin Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="admin" className="text-sm font-medium">
-                  Event Admin <span className="text-destructive">*</span>
-                </Label>
-                {loadingStaff ? (
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Loading admin users...</span>
-                  </div>
-                ) : (
-                  <Select 
-                    value={formData.admin.toString()} 
-                    onValueChange={handleAdminChange}
-                    disabled={!isEditing || loading}
-                  >
-                    <SelectTrigger className="pl-10">
-                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                        <UsersIcon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <SelectValue placeholder="Select an admin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {staffUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
-                          {getUserDisplayName(user)}
-                          {user.is_superadmin && " 👑"}
-                          {user.is_staff && !user.is_superadmin && " ⭐"}
-                          {user.id === currentUser?.id && " (You)"}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Current admin: {getUserDisplayName(staffUsers.find(u => u.id === formData.admin) || {} as User)}
-                </p>
-              </div>
-
-              {/* Date Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Event Start Date & Time */}
-                <div className="space-y-4">
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  {isEditing ? "Edit Event" : "View Event"}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  {isEditing 
+                    ? "Update the event details below" 
+                    : `Created on ${new Date(event.created_at || '').toLocaleDateString()} • ${event.participants?.length || 0} participants`
+                  }
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="pt-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Event Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="date" className="text-sm font-medium">
-                      Start Date & Time <span className="text-destructive">*</span>
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Event Name <span className="text-destructive">*</span>
                     </Label>
                     <div className="relative">
                       <Input
-                        type="datetime-local"
-                        id="date"
-                        name="date"
-                        value={formatDateForInput(formData.date)}
+                        id="name"
+                        name="name"
+                        placeholder="Enter event name"
+                        value={formData.name}
                         onChange={handleChange}
                         className="pl-10"
                         required
@@ -432,163 +494,328 @@ export default function ViewEventPage() {
                     </div>
                   </div>
 
-                  {/* Event End Date & Time */}
+                  {/* Admin Selection */}
                   <div className="space-y-2">
-                    <Label htmlFor="duration" className="text-sm font-medium">
-                      End Date & Time <span className="text-destructive">*</span>
+                    <Label htmlFor="admin" className="text-sm font-medium">
+                      Event Admin <span className="text-destructive">*</span>
                     </Label>
-                    <div className="relative">
-                      <Input
-                        type="datetime-local"
-                        id="duration"
-                        name="duration"
-                        value={formatDateForInput(formData.duration)}
-                        onChange={handleChange}
-                        className="pl-10"
-                        required
-                        disabled={!isEditing || loading}
-                      />
-                      <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Registration End Date */}
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="reg_end_date" className="text-sm font-medium">
-                      Registration End Date <span className="text-destructive">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        type="datetime-local"
-                        id="reg_end_date"
-                        name="reg_end_date"
-                        value={formData.reg_end_date}
-                        onChange={handleChange}
-                        className="pl-10"
-                        required
-                        disabled={!isEditing || loading}
-                      />
-                      <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Registration closes at 11:59 PM on this date
-                    </p>
-                  </div>
-
-                  {/* Event Duration Display */}
-                  <div className="bg-muted/50 rounded-lg p-3">
-                    <Label className="text-sm font-medium mb-2 block">Event Duration</Label>
-                    {formData.date && formData.duration ? (
-                      <div className="text-sm text-muted-foreground">
-                        <div>Starts: {new Date(formData.date).toLocaleString()}</div>
-                        <div>Ends: {new Date(formData.duration).toLocaleString()}</div>
-                        <div className="mt-1 text-xs">
-                          Duration: {calculateDuration(formData.date, formData.duration)}
-                        </div>
+                    {loadingStaff ? (
+                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Loading admin users...</span>
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">Fill in dates to see duration</p>
+                      <Select 
+                        value={formData.admin.toString()} 
+                        onValueChange={handleAdminChange}
+                        disabled={!isEditing || loading}
+                      >
+                        <SelectTrigger className="pl-10">
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                            <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <SelectValue placeholder="Select an admin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {staffUsers.map((user) => (
+                            <SelectItem key={user.id} value={user.id.toString()}>
+                              {getUserDisplayName(user)}
+                              {user.is_superadmin && " 👑"}
+                              {user.is_staff && !user.is_superadmin && " ⭐"}
+                              {user.id === currentUser?.id && " (You)"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Short Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium">
-                  Short Description <span className="text-destructive">*</span>
-                </Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Brief description of your event (will be shown in listings)"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="min-h-[80px] resize-vertical"
-                  required
-                  disabled={!isEditing || loading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Keep it concise - this appears in event previews
-                </p>
-              </div>
-
-              {/* Long Description */}
-              <div className="space-y-2">
-                <Label htmlFor="long_description" className="text-sm font-medium">
-                  Detailed Description
-                </Label>
-                <Textarea
-                  id="long_description"
-                  name="long_description"
-                  placeholder="Comprehensive details about your event, schedule, requirements, etc."
-                  value={formData.long_description}
-                  onChange={handleChange}
-                  className="min-h-[120px] resize-vertical"
-                  disabled={!isEditing || loading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Provide detailed information for interested participants
-                </p>
-              </div>
-
-              {/* Read-only Information */}
-              {!isEditing && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-primary">{event.participants?.length || 0}</p>
-                    <p className="text-sm text-muted-foreground">Participants</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Created: {new Date(event.created_at || '').toLocaleDateString()}
+                    <p className="text-xs text-muted-foreground">
+                      Current admin: {getUserDisplayName(staffUsers.find(u => u.id === formData.admin) || {} as User)}
                     </p>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Last Updated: {new Date(event.updated_at || event.created_at || '').toLocaleDateString()}
+
+                  {/* Date Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Event Start Date & Time */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="date" className="text-sm font-medium">
+                          Start Date & Time <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="datetime-local"
+                            id="date"
+                            name="date"
+                            value={formatDateForInput(formData.date)}
+                            onChange={handleChange}
+                            className="pl-10"
+                            required
+                            disabled={!isEditing || loading}
+                          />
+                          <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </div>
+
+                      {/* Event End Date & Time */}
+                      <div className="space-y-2">
+                        <Label htmlFor="duration" className="text-sm font-medium">
+                          End Date & Time <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="datetime-local"
+                            id="duration"
+                            name="duration"
+                            value={formatDateForInput(formData.duration)}
+                            onChange={handleChange}
+                            className="pl-10"
+                            required
+                            disabled={!isEditing || loading}
+                          />
+                          <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Registration End Date */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reg_end_date" className="text-sm font-medium">
+                          Registration End Date <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type="datetime-local"
+                            id="reg_end_date"
+                            name="reg_end_date"
+                            value={formData.reg_end_date}
+                            onChange={handleChange}
+                            className="pl-10"
+                            required
+                            disabled={!isEditing || loading}
+                          />
+                          <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Registration closes at 11:59 PM on this date
+                        </p>
+                      </div>
+
+                      {/* Event Duration Display */}
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <Label className="text-sm font-medium mb-2 block">Event Duration</Label>
+                        {formData.date && formData.duration ? (
+                          <div className="text-sm text-muted-foreground">
+                            <div>Starts: {new Date(formData.date).toLocaleString()}</div>
+                            <div>Ends: {new Date(formData.duration).toLocaleString()}</div>
+                            <div className="mt-1 text-xs">
+                              Duration: {calculateDuration(formData.date, formData.duration)}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Fill in dates to see duration</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Short Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-sm font-medium">
+                      Short Description <span className="text-destructive">*</span>
+                    </Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="Brief description of your event (will be shown in listings)"
+                      value={formData.description}
+                      onChange={handleChange}
+                      className="min-h-[80px] resize-vertical"
+                      required
+                      disabled={!isEditing || loading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Keep it concise - this appears in event previews
                     </p>
                   </div>
-                </div>
-              )}
 
-              {/* Action Buttons when Editing */}
-              {isEditing && (
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button 
-                    type="submit" 
-                    disabled={loading}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  {/* Long Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="long_description" className="text-sm font-medium">
+                      Detailed Description
+                    </Label>
+                    <Textarea
+                      id="long_description"
+                      name="long_description"
+                      placeholder="Comprehensive details about your event, schedule, requirements, etc."
+                      value={formData.long_description}
+                      onChange={handleChange}
+                      className="min-h-[120px] resize-vertical"
+                      disabled={!isEditing || loading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Provide detailed information for interested participants
+                    </p>
+                  </div>
+
+                  {/* Action Buttons when Editing */}
+                  {isEditing && (
+                    <div className="flex gap-3 pt-4 border-t">
+                      <Button 
+                        type="submit" 
+                        disabled={loading}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Saving Changes...
+                          </>
+                        ) : (
+                          <>
+                            <SaveIcon className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </Button>
+                      
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleEditToggle}
+                        disabled={loading}
+                      >
+                        <XIcon className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Participants Card */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-lg border-border h-fit">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <UsersIcon className="h-5 w-5" />
+                      Participants
+                    </CardTitle>
+                    <CardDescription>
+                      {participants.length} registered participants
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={downloadCSV}
+                    variant="outline"
+                    size="sm"
+                    disabled={participants.length === 0}
+                    className="flex items-center gap-2"
                   >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving Changes...
-                      </>
-                    ) : (
-                      <>
-                        <SaveIcon className="mr-2 h-4 w-4" />
-                        Save Changes
-                      </>
-                    )}
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={handleEditToggle}
-                    disabled={loading}
-                  >
-                    <XIcon className="mr-2 h-4 w-4" />
-                    Cancel
+                    <DownloadIcon className="h-4 w-4" />
+                    CSV
                   </Button>
                 </div>
-              )}
-            </form>
-          </CardContent>
-        </Card>
+              </CardHeader>
+              <CardContent>
+                {/* Search */}
+                <div className="relative mb-4">
+                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search participants..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="pl-10"
+                  />
+                </div>
+
+                {/* Participants Table */}
+                {loadingParticipants ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                ) : filteredParticipants.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {searchTerm ? "No participants match your search" : "No participants registered yet"}
+                  </div>
+                ) : (
+                  <>
+                    <div className="border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Registered</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {currentParticipants.map((participant) => (
+                            <TableRow key={participant.id}>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {participant.first_name} {participant.last_name}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    @{participant.username}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-sm">{participant.email}</TableCell>
+                              <TableCell>
+                                <Badge variant="secondary" className="text-xs">
+                                  {new Date(participant.registered_at).toLocaleDateString()}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-muted-foreground">
+                          Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredParticipants.length)} of {filteredParticipants.length} participants
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={prevPage}
+                            disabled={currentPage === 1}
+                          >
+                            <ChevronLeftIcon className="h-4 w-4" />
+                          </Button>
+                          <span className="text-sm text-muted-foreground">
+                            Page {currentPage} of {totalPages}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={nextPage}
+                            disabled={currentPage === totalPages}
+                          >
+                            <ChevronRightIcon className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
