@@ -1,0 +1,36 @@
+{
+    "core_members": [
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "Founder & Lead Engineer",
+            "image": "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=1000&q=80"
+        },
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "AI & Robotics Specialist",
+            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+        },
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "AI & Robotics Specialist",
+            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+        },
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "AI & Robotics Specialist",
+            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+        }
+    ],
+    "club_heads": [
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "Full Stack Developer",
+            "image": "https://images.unsplash.com/photo-1603415526960-f8f0a7090f88?auto=format&fit=crop&w=1000&q=80"
+        },
+        {
+            "name": "Ashutosh Vishwakarma",
+            "role": "Design & UI/UX",
+            "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1000&q=80"
+        }
+    ]
+}

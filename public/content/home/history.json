@@ -1,0 +1,29 @@
+{
+  "timeline": [
+    {
+      "year": "2019",
+      "event": "Founding of I2EDC",
+      "description": "Established the innovation cell to foster student entrepreneurship"
+    },
+    {
+      "year": "2020",
+      "event": "Launch of Protospace",
+      "description": "Opened our state-of-the-art prototyping facility"
+    },
+    {
+      "year": "2022",
+      "event": "Annual Innovation Summit",
+      "description": "Hosted our first major innovation conference"
+    },
+    {
+      "year": "2023",
+      "event": "Expanded Labs",
+      "description": "Added AI, Robotics, and IoT labs for students"
+    },
+    {
+      "year": "2024",
+      "event": "National Collaboration",
+      "description": "Partnered with institutes for nationwide innovation programs"
+    }
+  ]
+}

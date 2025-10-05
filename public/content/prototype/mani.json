@@ -1,0 +1,96 @@
+{
+  "hero": {
+    "title": ["Student", "Prototypes"],
+    "subtitle": "Discover innovative projects created by our student community. From cutting-edge tech to sustainable solutions, witness the future of innovation.",
+    "cta": {
+      "primary": { "label": "View Projects", "href": "#projects" },
+      "secondary": { "label": "Our Track Record", "href": "#stats" }
+    }
+  },
+
+  "featured": {
+    "heading": "Featured Projects",
+    "subheading": "Explore groundbreaking prototypes developed by our talented student innovators",
+    "searchPlaceholder": "Search projects...",
+    "noResults": "No projects found matching your criteria. Try adjusting your search filters.",
+    "statusMap": {
+      "completed": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      "in-progress": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      "planning": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+    },
+    "prototypes": [
+      {
+        "id": 1,
+        "title": "Smart Irrigation System",
+        "description": "AI-powered irrigation system that optimizes water usage based on soil moisture and weather predictions.",
+        "longDescription": "# Smart Irrigation System\n\n![Smart Irrigation](https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=400&fit=crop)\n\n## Project Overview\n\nThe Smart Irrigation System is an AI-powered solution that revolutionizes agricultural water management. Using machine learning algorithms and IoT sensors, the system optimizes water usage in real-time, reducing water consumption by up to 40% while maintaining crop health.\n\n## Key Features\n\n- **Real-time Monitoring**: Continuous soil moisture and weather data collection\n- **Predictive Analytics**: Machine learning models predict optimal irrigation schedules\n- **Remote Control**: Mobile app for manual override and monitoring\n- **Water Conservation**: Smart algorithms reduce water waste significantly\n\n## Technical Stack\n\n- **Hardware**: Arduino Uno, Soil Moisture Sensors, Weather Station\n- **Software**: Python, TensorFlow, React Native\n- **Cloud**: AWS IoT Core, MongoDB\n- **APIs**: Weather API, Soil Data API\n\n## Impact\n\n- 40% reduction in water usage\n- 25% increase in crop yield\n- Real-time monitoring capabilities\n- Scalable for large farms\n\n## Team Members\n\n- Alice Chen - Hardware & IoT\n- Bob Smith - Machine Learning\n- Charlie Davis - Mobile Development\n\n## Future Enhancements\n\n- Integration with drone technology\n- Multi-crop optimization\n- Blockchain for supply chain tracking",
+        "category": "iot",
+        "status": "completed",
+        "team": ["Alice Chen", "Bob Smith", "Charlie Davis"],
+        "technologies": ["Arduino", "Python", "IoT", "TensorFlow", "React Native"],
+        "github": "https://github.com",
+        "demo": "https://demo.com",
+        "images": [
+          "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=400&fit=crop",
+          "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop",
+          "https://images.unsplash.com/photo-1586771107445-d3ca888129ce?w=400&h=300&fit=crop"
+        ],
+        "date": "2024-01-15"
+      },
+      {
+        "id": 2,
+        "title": "Medical Drone Delivery",
+        "description": "Autonomous drone system for emergency medical supply delivery in remote areas.",
+        "longDescription": "# Medical Drone Delivery System\n\n![Medical Drone](https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&h=400&fit=crop)\n\n## Project Vision\n\nRevolutionizing emergency healthcare delivery in remote and inaccessible areas through autonomous drone technology. This system ensures timely delivery of critical medical supplies like vaccines, blood, and emergency medications.\n\n## Technical Specifications\n\n### Drone Capabilities\n- **Range**: 50km radius\n- **Payload**: 5kg medical supplies\n- **Speed**: 60 km/h\n- **Battery**: 2 hours flight time\n- **Navigation**: GPS + Computer Vision\n\n### Safety Features\n- Redundant flight systems\n- Emergency parachute deployment\n- Real-time health monitoring\n- Weather-resistant design\n\n## Impact Metrics\n- Reduced delivery time from 4 hours to 15 minutes\n- 95% delivery success rate in testing\n- Potential to save thousands of lives annually\n- Cost-effective compared to traditional methods\n\n## Technology Stack\n- **Hardware**: Custom drone frame, Pixhawk flight controller\n- **Software**: ROS, Python, OpenCV\n- **AI**: Object detection and avoidance\n- **Communication**: 4G/LTE with satellite backup\n\n## Team\n- David Wilson - Robotics Engineering\n- Eva Martinez - Computer Vision\n- Frank Thompson - Systems Integration",
+        "category": "robotics",
+        "status": "in-progress",
+        "team": ["David Wilson", "Eva Martinez"],
+        "technologies": ["ROS", "Python", "Computer Vision", "OpenCV", "Pixhawk"],
+        "github": "https://github.com",
+        "demo": null,
+        "images": [
+          "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&h=400&fit=crop",
+          "https://images.unsplash.com/photo-1506941433945-99a2aa4bd50a?w=400&h=300&fit=crop"
+        ],
+        "date": "2024-02-20"
+      }
+    ]
+  },
+
+  "categories": {
+    "heading": "Project Categories",
+    "cards": [
+      { "title": "Internet of Things", "description": "Connected devices and smart systems", "icon": "📱", "count": "12 Projects", "gradient": "from-blue-500 to-cyan-500" },
+      { "title": "Artificial Intelligence", "description": "Machine learning and intelligent systems", "icon": "🤖", "count": "8 Projects", "gradient": "from-purple-500 to-pink-500" },
+      { "title": "Robotics", "description": "Automated systems and mechanical innovation", "icon": "⚙️", "count": "6 Projects", "gradient": "from-green-500 to-teal-500" },
+      { "title": "Sustainability", "description": "Eco-friendly and green technology", "icon": "🌱", "count": "9 Projects", "gradient": "from-yellow-500 to-orange-500" },
+      { "title": "Healthcare Tech", "description": "Medical devices and health solutions", "icon": "🏥", "count": "7 Projects", "gradient": "from-red-500 to-pink-500" },
+      { "title": "Education Tech", "description": "Learning platforms and educational tools", "icon": "🎓", "count": "5 Projects", "gradient": "from-indigo-500 to-purple-500" }
+    ]
+  },
+
+  "showcase": {
+    "heading": "Innovation Showcase",
+    "stats": [
+      { "number": "50+", "label": "Projects Completed" },
+      { "number": "200+", "label": "Student Innovators" },
+      { "number": "15+", "label": "Technologies Used" },
+      { "number": "10+", "label": "Industry Partners" }
+    ],
+    "summary": "Our students have developed innovative solutions that address real-world challenges, from environmental sustainability to healthcare and education technology.",
+    "cta": { "label": "View All Projects", "href": "#" }
+  },
+
+  "getInvolved": {
+    "heading": "Get Involved",
+    "summary": "Ready to turn your idea into reality? Join our community of innovators and start building the future today.",
+    "steps": [
+      { "step": "01", "title": "Share Your Idea", "description": "Present your innovative concept to our team", "icon": "💡" },
+      { "step": "02", "title": "Get Resources", "description": "Access our labs, equipment, and mentorship", "icon": "🛠️" },
+      { "step": "03", "title": "Build & Iterate", "description": "Develop your prototype with expert guidance", "icon": "🚀" },
+      { "step": "04", "title": "Showcase", "description": "Present your project to the community", "icon": "🏆" }
+    ],
+    "primaryCta": { "label": "Start Your Project", "href": "#" },
+    "secondaryCta": { "label": "Join as Mentor", "href": "#" }
+  }
+}

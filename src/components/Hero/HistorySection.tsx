@@ -6,46 +6,82 @@ import "react-vertical-timeline-component/style.min.css";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { FaHistory } from "react-icons/fa";
+import { useContent } from "@/context/ContentContext";
 
 const HistorySection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
-  const historyData = [
-    {
-      year: "2019",
-      event: "Founding of I2EDC",
-      description:
-        "Established the innovation cell to foster student entrepreneurship",
-    },
-    {
-      year: "2020",
-      event: "Launch of Protospace",
-      description: "Opened our state-of-the-art prototyping facility",
-    },
-    {
-      year: "2022",
-      event: "Annual Innovation Summit",
-      description: "Hosted our first major innovation conference",
-    },
-    {
-      year: "2023",
-      event: "Expanded Labs",
-      description: "Added AI, Robotics, and IoT labs for students",
-    },
-    {
-      year: "2024",
-      event: "National Collaboration",
-      description:
-        "Partnered with institutes for nationwide innovation programs",
-    },
-  ];
+  const { content, loading, error } = useContent();
 
   const sectionBg = isDark
     ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
     : "bg-gradient-to-br from-blue-50 via-cyan-50 to-slate-100";
 
   const titleColor = isDark ? "text-white" : "text-gray-900";
+
+  // Loading state
+  if (loading && !content.history) {
+    return (
+      <section className={`w-full min-h-screen flex items-center justify-center ${sectionBg}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            Loading history...
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error && !content.history) {
+    return (
+      <section className={`w-full min-h-screen flex items-center justify-center ${sectionBg}`}>
+        <div className="text-center">
+          <p className={`text-lg text-red-500 mb-4`}>Error loading history content</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className={`px-6 py-3 rounded-lg font-semibold ${
+              isDark 
+                ? "bg-white/10 text-white border border-white/30" 
+                : "bg-gray-100 text-gray-800 border border-gray-300"
+            }`}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Fallback content if no history data
+  const historyData = content.history?.timeline || [
+    {
+      year: "2019",
+      event: "Founding of I2EDC",
+      description: "Established the innovation cell to foster student entrepreneurship"
+    },
+    {
+      year: "2020",
+      event: "Launch of Protospace",
+      description: "Opened our state-of-the-art prototyping facility"
+    },
+    {
+      year: "2022",
+      event: "Annual Innovation Summit",
+      description: "Hosted our first major innovation conference"
+    },
+    {
+      year: "2023",
+      event: "Expanded Labs",
+      description: "Added AI, Robotics, and IoT labs for students"
+    },
+    {
+      year: "2024",
+      event: "National Collaboration",
+      description: "Partnered with institutes for nationwide innovation programs"
+    }
+  ];
 
   return (
     <section
@@ -65,9 +101,9 @@ const HistorySection = () => {
         </motion.h2>
 
         <VerticalTimeline lineColor={isDark ? "cyan" : "blue"}>
-          {historyData.map((milestone) => (
+          {historyData.map((milestone:any, index:any) => (
             <VerticalTimelineElement
-              key={milestone.year}
+              key={`${milestone.year}-${index}`}
               date={milestone.year}
               iconStyle={{
                 background: isDark ? "#06b6d4" : "#3b82f6",

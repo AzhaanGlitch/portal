@@ -1,0 +1,19 @@
+{
+  "prototypes": [
+    {
+      "title": "Smart Agriculture System",
+      "description": "An automatic system for monitoring and optimising crop growth.",
+      "category": "IoT & Automation"
+    },
+    {
+      "title": "Wearable Health Tracker",
+      "description": "A device for tracking vital signs and promoting healing habits.",
+      "category": "Healthcare"
+    },
+    {
+      "title": "Sustainable Energy Solution",
+      "description": "A solution for generating clean energy from renewable sources.",
+      "category": "Energy"
+    }
+  ]
+}
