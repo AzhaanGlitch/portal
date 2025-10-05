@@ -3,10 +3,13 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useContent } from "@/context/ContentContext";
+
 const ServicesSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { content, loading, error } = useContent();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,97 +18,81 @@ const ServicesSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const services = [
+  // Loading state
+  if (loading && !content.services) {
+    return (
+      <section className={`relative w-full min-h-screen flex items-center justify-center overflow-hidden py-16 ${
+        isDark 
+          ? "bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900" 
+          : "bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50"
+      }`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            Loading services...
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error && !content.services) {
+    return (
+      <section className={`relative w-full min-h-screen flex items-center justify-center overflow-hidden py-16 ${
+        isDark 
+          ? "bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900" 
+          : "bg-gradient-to-br from-cyan-50 via-blue-50 to-slate-50"
+      }`}>
+        <div className="text-center">
+          <p className={`text-lg text-red-500 mb-4`}>Error loading services content</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className={`px-6 py-3 rounded-lg font-semibold ${
+              isDark 
+                ? "bg-white/10 text-white border border-white/30" 
+                : "bg-gray-100 text-gray-800 border border-gray-300"
+            }`}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Fallback content if no services data
+  const servicesData = content.services?.services || [
     {
       title: "3D Printing",
-      description:
-        "High-precision additive manufacturing for prototypes and production parts",
-      icon: (
-        <svg
-          className="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      ),
+      description: "High-precision additive manufacturing for prototypes and production parts",
       color: "from-blue-500 to-cyan-400",
+      icon: "<svg className=\"w-8 h-8\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M19 9l-7 7-7-7\" /></svg>"
     },
     {
       title: "Laser Cutting",
-      description:
-        "Precision laser cutting services for various materials with clean edges",
-      icon: (
-        <svg
-          className="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-          />
-        </svg>
-      ),
+      description: "Precision laser cutting services for various materials with clean edges",
       color: "from-purple-500 to-pink-500",
+      icon: "<svg className=\"w-8 h-8\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M12 19l9 2-9-18-9 18 9-2zm0 0v-8\" /></svg>"
     },
     {
       title: "CNC Machining",
-      description:
-        "Computer-controlled machining for high-accuracy parts and components",
-      icon: (
-        <svg
-          className="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
-      ),
+      description: "Computer-controlled machining for high-accuracy parts and components",
       color: "from-amber-500 to-orange-500",
+      icon: "<svg className=\"w-8 h-8\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z\" /><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\" /></svg>"
     },
     {
       title: "Design Consultation",
       description: "Expert guidance to optimize your designs for manufacturing",
-      icon: (
-        <svg
-          className="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-          />
-        </svg>
-      ),
       color: "from-green-500 to-emerald-400",
-    },
+      icon: "<svg className=\"w-8 h-8\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z\" /></svg>"
+    }
   ];
+
+  // Function to render SVG from string
+  const renderSVG = (svgString: string) => {
+    return <div dangerouslySetInnerHTML={{ __html: svgString }} />;
+  };
 
   // Theme styles
   const sectionBg = isDark
@@ -158,9 +145,9 @@ const ServicesSection = () => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {services.map((service, index) => (
+          {servicesData.map((service:any, index:any) => (
             <motion.div
-              key={index}
+              key={`${service.title}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
               transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
@@ -170,7 +157,7 @@ const ServicesSection = () => {
               <div
                 className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${service.color} mb-4`}
               >
-                {service.icon}
+                {renderSVG(service.icon)}
               </div>
               <h3 className={`text-xl font-bold mb-2 ${serviceTitleColor}`}>
                 {service.title}

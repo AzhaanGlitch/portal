@@ -7,6 +7,7 @@ import { ScrollProvider } from "@/context/ScrollContext";
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ContentProvider } from '@/context/ContentContext';
 
 function PreWrapper({ children }: { children: React.ReactNode }) {
     return (
@@ -26,11 +27,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <PreWrapper>{children}</PreWrapper>
     ) : (
         <AuthProvider>
-            <PreWrapper>
-                <Header />
-                {children}
-                <Footer />
-            </PreWrapper>
+            <ContentProvider>
+                <PreWrapper>
+                    <Header />
+                    {children}
+                    <Footer />
+                </PreWrapper>
+            </ContentProvider>
         </AuthProvider>
     );
 }

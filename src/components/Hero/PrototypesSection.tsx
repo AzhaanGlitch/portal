@@ -1,30 +1,73 @@
 "use client";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
+import { useContent } from "@/context/ContentContext";
 
 export default function PrototypesSection() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { content, loading, error } = useContent();
 
-  const prototypes = [
+  // Loading state
+  if (loading && !content.prototypes) {
+    return (
+      <section className={`relative w-full min-h-screen flex items-center justify-center ${
+        isDark 
+          ? "bg-gradient-to-br from-slate-900 via-green-900 to-slate-900" 
+          : "bg-gradient-to-br from-green-50 via-cyan-50 to-emerald-50"
+      }`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            Loading prototypes...
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error && !content.prototypes) {
+    return (
+      <section className={`relative w-full min-h-screen flex items-center justify-center ${
+        isDark 
+          ? "bg-gradient-to-br from-slate-900 via-green-900 to-slate-900" 
+          : "bg-gradient-to-br from-green-50 via-cyan-50 to-emerald-50"
+      }`}>
+        <div className="text-center">
+          <p className={`text-lg text-red-500 mb-4`}>Error loading prototypes content</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className={`px-6 py-3 rounded-lg font-semibold ${
+              isDark 
+                ? "bg-white/10 text-white border border-white/30" 
+                : "bg-gray-100 text-gray-800 border border-gray-300"
+            }`}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Fallback content if no prototypes data
+  const prototypesData = content.prototypes?.prototypes || [
     {
       title: "Smart Agriculture System",
-      description:
-        "An automatic system for monitoring and optimising crop growth.",
-      category: "IoT & Automation",
+      description: "An automatic system for monitoring and optimising crop growth.",
+      category: "IoT & Automation"
     },
     {
       title: "Wearable Health Tracker",
-      description:
-        "A device for tracking vital signs and promoting healing habits.",
-      category: "Healthcare",
+      description: "A device for tracking vital signs and promoting healing habits.",
+      category: "Healthcare"
     },
     {
       title: "Sustainable Energy Solution",
-      description:
-        "A solution for generating clean energy from renewable sources.",
-      category: "Energy",
-    },
+      description: "A solution for generating clean energy from renewable sources.",
+      category: "Energy"
+    }
   ];
 
   // Theme-based styles
@@ -68,9 +111,9 @@ export default function PrototypesSection() {
         </motion.h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {prototypes.map((prototype, index) => (
+          {prototypesData.map((prototype:any, index:any) => (
             <motion.div
-              key={prototype.title}
+              key={`${prototype.title}-${index}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}

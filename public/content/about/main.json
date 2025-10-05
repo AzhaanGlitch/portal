@@ -1,0 +1,56 @@
+{
+  "hero": {
+    "title": ["About", "I2EDC"],
+    "subtitle": "Fostering innovation and entrepreneurship through cutting-edge resources, mentorship, and a vibrant community of student innovators",
+    "cta": {
+      "primary": { "label": "Our Mission", "href": "#mission" },
+      "secondary": { "label": "Meet the Team", "href": "#team" }
+    }
+  },
+
+  "mission": {
+    "heading": "Our Mission",
+    "paragraphs": [
+      "At the Institute Innovation Entrepreneurship Development Cell (I2EDC), we're revolutionizing student innovation with state-of-the-art facilities and mentorship that empower students to transform ideas into reality.",
+      "Our mission is to provide accessible innovation resources, foster entrepreneurial thinking, and build a vibrant community where creativity meets execution."
+    ],
+    "pillars": [
+      { "title": "Innovation", "desc": "Creating an ecosystem that nurtures groundbreaking ideas", "icon": "🚀", "gradient": ["#3B82F6", "#22D3EE"] },
+      { "title": "Accessibility", "desc": "Making innovation resources available to every student", "icon": "🔓", "gradient": ["#10B981", "#14B8A6"] },
+      { "title": "Community", "desc": "Building a collaborative network of student innovators", "icon": "🤝", "gradient": ["#8B5CF6", "#EC4899"] }
+    ]
+  },
+
+  "values": {
+    "heading": "Our Values",
+    "summary": "These values guide our decisions, shape our culture, and drive us toward our vision of creating the next generation of innovators and entrepreneurs.",
+    "cards": [
+      { "title": "Excellence", "desc": "We pursue technical excellence in every project, from prototyping to execution.", "icon": "⭐", "gradient": ["#F59E0B", "#F97316"] },
+      { "title": "Innovation", "desc": "We challenge conventions and pioneer new approaches to problem-solving.", "icon": "💡", "gradient": ["#3B82F6", "#22D3EE"] },
+      { "title": "Collaboration", "desc": "We believe great achievements are born from teamwork and shared vision.", "icon": "🤝", "gradient": ["#10B981", "#14B8A6"] },
+      { "title": "Integrity", "desc": "We operate with transparency, honesty, and ethical principles.", "icon": "🔒", "gradient": ["#8B5CF6", "#EC4899"] }
+    ]
+  },
+
+  "timeline": {
+    "heading": "Our Journey",
+    "milestones": [
+      { "year": "2018", "event": "I2EDC established with vision for student innovation hub" },
+      { "year": "2019", "event": "Launched Protospace with initial prototyping equipment" },
+      { "year": "2020", "event": "Expanded to include Tinkering Lab and Machine Services" },
+      { "year": "2022", "event": "100+ student projects supported, 10+ startups incubated" },
+      { "year": "2024", "event": "Became premier innovation hub with 500+ active members" }
+    ]
+  },
+
+  "leadership": {
+    "heading": "Leadership Team",
+    "summary": "Our leadership team brings together faculty expertise and student passion to create an environment where innovation thrives and entrepreneurial dreams take flight.",
+    "members": [
+      { "name": "Dr. Sarah Johnson", "role": "Faculty Coordinator", "bio": "Professor of Innovation & Entrepreneurship with 10+ years experience in student mentorship." },
+      { "name": "Rajesh Kumar", "role": "Student President", "bio": "Final year Engineering student with multiple successful innovation projects." },
+      { "name": "Priya Sharma", "role": "Technical Head", "bio": "Expert in prototyping technologies and maker space management." },
+      { "name": "Amit Patel", "role": "Operations Manager", "bio": "Manages I2EDC facilities and coordinates innovation workshops." }
+    ]
+  }
+}

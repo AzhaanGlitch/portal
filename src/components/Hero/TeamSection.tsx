@@ -2,58 +2,91 @@
 "use client";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
+import { useContent } from "@/context/ContentContext";
 
 const TeamSection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { content, loading, error } = useContent();
 
-  const coreMembers = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "Founder & Lead Engineer",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "AI & Robotics Specialist",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "AI & Robotics Specialist",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "AI & Robotics Specialist",
-    },
-  ];
+  // Loading state
+  if (loading && !content.team) {
+    return (
+      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            Loading team...
+          </p>
+        </div>
+      </section>
+    );
+  }
 
-  const clubHeads = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1603415526960-f8f0a7090f88?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "Full Stack Developer",
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1000&q=80",
-      name: "Ashutosh Vishwakarma",
-      role: "Design & UI/UX",
-    },
-  ];
+  // Error state
+  if (error && !content.team) {
+    return (
+      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="text-center">
+          <p className={`text-lg text-red-500 mb-4`}>Error loading team content</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className={`px-6 py-3 rounded-lg font-semibold ${
+              isDark 
+                ? "bg-white/10 text-white border border-white/30" 
+                : "bg-gray-100 text-gray-800 border border-gray-300"
+            }`}
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
 
-  const renderTeam = (members: typeof coreMembers, delayBase = 0) => (
+  // Fallback content if no team data
+  const teamData = content.team || {
+    core_members: [
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "Founder & Lead Engineer",
+        image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "AI & Robotics Specialist",
+        image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "AI & Robotics Specialist",
+        image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "AI & Robotics Specialist",
+        image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    club_heads: [
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "Full Stack Developer",
+        image: "https://images.unsplash.com/photo-1603415526960-f8f0a7090f88?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        name: "Ashutosh Vishwakarma",
+        role: "Design & UI/UX",
+        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1000&q=80"
+      }
+    ]
+  };
+
+  const renderTeam = (members: typeof teamData.core_members, delayBase = 0) => (
     <div className="flex flex-wrap justify-center gap-8 mb-8">
-      {members.map((member, index) => (
+      {members.map((member:any, index:any) => (
         <motion.div
-          key={index}
+          key={`${member.name}-${index}`}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -112,7 +145,7 @@ const TeamSection = () => {
         >
           I2EDC Core Members
         </motion.h3>
-        {renderTeam(coreMembers)}
+        {renderTeam(teamData.core_members)}
 
         {/* Club Heads & Student Leaders */}
         <motion.h3
@@ -125,7 +158,7 @@ const TeamSection = () => {
         >
           Club Heads & Student Leaders
         </motion.h3>
-        {renderTeam(clubHeads, 0.3)}
+        {renderTeam(teamData.club_heads, 0.3)}
       </div>
     </section>
   );

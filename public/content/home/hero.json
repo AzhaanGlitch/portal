@@ -1,0 +1,29 @@
+{
+  "headline": {
+    "parts": [
+      {
+        "text": "Innovate.",
+        "style": "gradient-blue-purple"
+      },
+      {
+        "text": "Create.",
+        "style": "gradient-green-cyan"
+      },
+      {
+        "text": "Transform.",
+        "style": "gradient-orange-pink"
+      }
+    ]
+  },
+  "description": "The Institute Innovation Entrepreneurship Development Cell (I2EDC) is a hub for student innovators and entrepreneurs. We provide resources, mentorship, and a vibrant community to help you bring your ideas to life.",
+  "buttons": [
+    {
+      "text": "Explore I2EDC",
+      "action": "scroll_to_explore"
+    },
+    {
+      "text": "Join Community",
+      "action": "navigate_to_auth"
+    }
+  ]
+}
