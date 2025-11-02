@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import LiquidEther from "../animations/LiquidEther/LiquidEther";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,19 +18,39 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   Search,
-  Filter,
   ExternalLink,
   Github,
   Users,
-  Calendar,
   Tag,
   X,
   ArrowRight,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
+import { useContent } from "@/context/ContentContext";
 
 export default function PrototypesPage() {
+  const { content, loading, error } = useContent();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-red-600 mb-4">Error loading content</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <PrototypesHeroSection />
@@ -44,7 +64,13 @@ export default function PrototypesPage() {
 
 const PrototypesHeroSection = () => {
   const { theme } = useTheme();
+  const { content } = useContent();
   const isDark = theme === "dark";
+
+  const heroContent = content?.all_prototypes?.hero || {};
+  const title = heroContent.title || ["Student", "Prototypes"];
+  const subtitle = heroContent.subtitle || "Explore innovative prototypes developed by our student community.";
+  const cta = heroContent.cta || {};
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
@@ -72,7 +98,7 @@ const PrototypesHeroSection = () => {
                 : "from-blue-600 to-purple-700"
             } bg-clip-text text-transparent`}
           >
-            Student
+            {title[0]}
           </span>{" "}
           <span
             className={`bg-gradient-to-r ${
@@ -81,7 +107,7 @@ const PrototypesHeroSection = () => {
                 : "from-green-600 to-cyan-700"
             } bg-clip-text text-transparent`}
           >
-            Prototypes
+            {title[1]}
           </span>
         </motion.h1>
 
@@ -93,9 +119,7 @@ const PrototypesHeroSection = () => {
             isDark ? "text-gray-300" : "text-gray-700"
           }`}
         >
-          Discover innovative projects created by our student community. From
-          cutting-edge tech to sustainable solutions, witness the future of
-          innovation.
+          {subtitle}
         </motion.p>
 
         <motion.div
@@ -104,32 +128,36 @@ const PrototypesHeroSection = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
         >
-          <Link href={"#projects"}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 border ${
-                isDark
-                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
-                  : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
-              }`}
-            >
-              View Projects
-            </motion.button>
-          </Link>
-          <Link href={"#stats"}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-8 py-4 rounded-lg font-semibold border transition-all duration-300 ${
-                isDark
-                  ? "bg-transparent text-white border-white/30 hover:bg-white/10"
-                  : "bg-transparent text-gray-800 border-gray-400 hover:bg-gray-100/50"
-              }`}
-            >
-              Our Track Record
-            </motion.button>
-          </Link>
+          {cta.primary && (
+            <Link href={cta.primary.href || "#projects"}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 border ${
+                  isDark
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+                    : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
+                }`}
+              >
+                {cta.primary.label || "View Projects"}
+              </motion.button>
+            </Link>
+          )}
+          {cta.secondary && (
+            <Link href={cta.secondary.href || "#stats"}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-8 py-4 rounded-lg font-semibold border transition-all duration-300 ${
+                  isDark
+                    ? "bg-transparent text-white border-white/30 hover:bg-white/10"
+                    : "bg-transparent text-gray-800 border-gray-400 hover:bg-gray-100/50"
+                }`}
+              >
+                {cta.secondary.label || "Our Track Record"}
+              </motion.button>
+            </Link>
+          )}
         </motion.div>
       </div>
 
@@ -165,11 +193,19 @@ const PrototypesHeroSection = () => {
 
 const FeaturedPrototypesSection = () => {
   const { theme } = useTheme();
+  const { content } = useContent();
   const isDark = theme === "dark";
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPrototype, setSelectedPrototype] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
+  // Safe data access
+  const featuredContent = content?.all_prototypes?.featured || {};
+  const prototypes = useMemo(
+    () => Array.isArray(featuredContent.prototypes) ? featuredContent.prototypes : [],
+    [featuredContent.prototypes]
+  );
 
   const sectionBg = isDark
     ? "bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900"
@@ -181,404 +217,50 @@ const FeaturedPrototypesSection = () => {
 
   const titleColor = isDark ? "text-white" : "text-gray-900";
   const textColor = isDark ? "text-gray-300" : "text-gray-700";
-  const accentColor = isDark ? "text-blue-400" : "text-blue-600";
 
-  const prototypes = [
-    {
-      id: 1,
-      title: "Smart Irrigation System",
-      description:
-        "AI-powered irrigation system that optimizes water usage based on soil moisture and weather predictions.",
-      long_description: `# Smart Irrigation System
-
-![Smart Irrigation](https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=400&fit=crop)
-
-## Project Overview
-
-The Smart Irrigation System is an AI-powered solution that revolutionizes agricultural water management. Using machine learning algorithms and IoT sensors, the system optimizes water usage in real-time, reducing water consumption by up to 40% while maintaining crop health.
-
-## Key Features
-
-- **Real-time Monitoring**: Continuous soil moisture and weather data collection
-- **Predictive Analytics**: Machine learning models predict optimal irrigation schedules
-- **Remote Control**: Mobile app for manual override and monitoring
-- **Water Conservation**: Smart algorithms reduce water waste significantly
-
-## Technical Stack
-
-- **Hardware**: Arduino Uno, Soil Moisture Sensors, Weather Station
-- **Software**: Python, TensorFlow, React Native
-- **Cloud**: AWS IoT Core, MongoDB
-- **APIs**: Weather API, Soil Data API
-
-## Impact
-
-- 40% reduction in water usage
-- 25% increase in crop yield
-- Real-time monitoring capabilities
-- Scalable for large farms
-
-## Team Members
-
-- Alice Chen - Hardware & IoT
-- Bob Smith - Machine Learning
-- Charlie Davis - Mobile Development
-
-## Future Enhancements
-
-- Integration with drone technology
-- Multi-crop optimization
-- Blockchain for supply chain tracking`,
-      category: "iot",
-      status: "completed",
-      team: ["Alice Chen", "Bob Smith", "Charlie Davis"],
-      technologies: ["Arduino", "Python", "IoT", "TensorFlow", "React Native"],
-      github: "https://github.com",
-      demo: "https://demo.com",
-      images: [
-        "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1586771107445-d3ca888129ce?w=400&h=300&fit=crop",
-      ],
-      date: "2024-01-15",
-    },
-    {
-      id: 2,
-      title: "Medical Drone Delivery",
-      description:
-        "Autonomous drone system for emergency medical supply delivery in remote areas.",
-      long_description: `# Medical Drone Delivery System
-
-![Medical Drone](https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&h=400&fit=crop)
-
-## Project Vision
-
-Revolutionizing emergency healthcare delivery in remote and inaccessible areas through autonomous drone technology. This system ensures timely delivery of critical medical supplies like vaccines, blood, and emergency medications.
-
-## Technical Specifications
-
-### Drone Capabilities
-- **Range**: 50km radius
-- **Payload**: 5kg medical supplies
-- **Speed**: 60 km/h
-- **Battery**: 2 hours flight time
-- **Navigation**: GPS + Computer Vision
-
-### Safety Features
-- Redundant flight systems
-- Emergency parachute deployment
-- Real-time health monitoring
-- Weather-resistant design
-
-## Impact Metrics
-- Reduced delivery time from 4 hours to 15 minutes
-- 95% delivery success rate in testing
-- Potential to save thousands of lives annually
-- Cost-effective compared to traditional methods
-
-## Technology Stack
-- **Hardware**: Custom drone frame, Pixhawk flight controller
-- **Software**: ROS, Python, OpenCV
-- **AI**: Object detection and avoidance
-- **Communication**: 4G/LTE with satellite backup
-
-## Team
-- David Wilson - Robotics Engineering
-- Eva Martinez - Computer Vision
-- Frank Thompson - Systems Integration`,
-      category: "robotics",
-      status: "in-progress",
-      team: ["David Wilson", "Eva Martinez"],
-      technologies: ["ROS", "Python", "Computer Vision", "OpenCV", "Pixhawk"],
-      github: "https://github.com",
-      demo: null,
-      images: [
-        "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1506941433945-99a2aa4bd50a?w=400&h=300&fit=crop",
-      ],
-      date: "2024-02-20",
-    },
-    {
-      id: 3,
-      title: "Eco-Friendly Packaging",
-      description:
-        "Biodegradable packaging material made from agricultural waste.",
-      long_description: `# Eco-Friendly Packaging Solution
-
-![Eco Packaging](https://images.unsplash.com/photo-1558769132-cb25c5d11e83?w=800&h=400&fit=crop)
-
-## Innovation in Sustainability
-
-Transforming agricultural waste into high-performance, biodegradable packaging materials. This solution addresses the global plastic pollution crisis while creating value from waste products.
-
-## Material Properties
-
-- **Biodegradation**: 90 days in compost
-- **Strength**: Comparable to conventional plastics
-- **Water Resistance**: Suitable for food packaging
-- **Cost**: 30% cheaper than bioplastics
-- **Source**: Rice husk, sugarcane bagasse, corn stover
-
-## Manufacturing Process
-
-1. **Collection**: Agricultural waste from local farms
-2. **Processing**: Mechanical and chemical treatment
-3. **Forming**: Injection molding and extrusion
-4. **Finishing**: Quality control and packaging
-
-## Environmental Impact
-- Reduces plastic waste by 1 ton per 2 tons produced
-- Carbon negative manufacturing process
-- Supports circular economy
-- Creates rural employment opportunities
-
-## Applications
-- Food packaging
-- E-commerce shipping
-- Consumer goods
-- Medical supplies (sterile packaging)
-
-## Team
-- Grace Lee - Material Science
-- Henry Brown - Chemical Engineering
-- Ivy Chen - Business Development`,
-      category: "sustainability",
-      status: "completed",
-      team: ["Grace Lee", "Henry Brown"],
-      technologies: ["Material Science", "Chemistry", "Biodegradable Polymers"],
-      github: null,
-      demo: "https://demo.com",
-      images: [
-        "https://images.unsplash.com/photo-1558769132-cb25c5d11e83?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1587332278432-1517e92c0c7a?w=400&h=300&fit=crop",
-      ],
-      date: "2024-01-30",
-    },
-    {
-      id: 4,
-      title: "VR Learning Platform",
-      description:
-        "Immersive virtual reality platform for interactive STEM education.",
-      long_description: `# VR Learning Platform
-
-![VR Education](https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=800&h=400&fit=crop)
-
-## Transforming STEM Education
-
-An immersive virtual reality platform that makes complex STEM concepts accessible and engaging through interactive 3D simulations and gamified learning experiences.
-
-## Key Features
-
-### Interactive Simulations
-- Molecular biology in 3D space
-- Physics experiments in virtual labs
-- Astronomical exploration
-- Engineering design simulations
-
-### Learning Analytics
-- Real-time progress tracking
-- Adaptive learning paths
-- Performance analytics
-- Teacher dashboard
-
-## Technical Architecture
-- **Platform**: Unity 3D Engine
-- **VR Support**: Oculus Quest, HTC Vive
-- **Backend**: Node.js, MongoDB
-- **AI**: Personalized learning algorithms
-
-## Educational Impact
-- 65% improvement in concept retention
-- 80% increase in student engagement
-- Accessible to diverse learning styles
-- Reduces need for physical lab equipment
-
-## Team
-- Jack Wilson - VR Development
-- Karen Adams - Educational Design
-- Leo Martinez - Backend Systems`,
-      category: "education",
-      status: "planning",
-      team: ["Jack Wilson", "Karen Adams", "Leo Martinez"],
-      technologies: ["Unity", "C#", "VR", "Node.js", "MongoDB"],
-      github: "https://github.com",
-      demo: null,
-      images: [
-        "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=300&fit=crop",
-      ],
-      date: "2024-03-10",
-    },
-    {
-      id: 5,
-      title: "Blockchain Voting System",
-      description:
-        "Secure and transparent voting system using blockchain technology.",
-      long_description: `# Blockchain Voting System
-
-![Blockchain Voting](https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=400&fit=crop)
-
-## Secure Digital Democracy
-
-A blockchain-based voting system that ensures transparency, security, and accessibility in electoral processes while maintaining voter privacy and preventing fraud.
-
-## Core Features
-
-### Security Measures
-- End-to-end encryption
-- Zero-knowledge proofs
-- Immutable transaction ledger
-- Multi-factor authentication
-
-### Accessibility
-- Mobile and web interfaces
-- Multi-language support
-- Accessibility compliance
-- Offline capability
-
-## Technology Implementation
-- **Blockchain**: Ethereum-based private chain
-- **Smart Contracts**: Solidity
-- **Frontend**: React, TypeScript
-- **Security**: Cryptographic voting protocols
-
-## Benefits
-- 100% audit trail of votes
-- Real-time result verification
-- Reduced election costs by 70%
-- Increased voter turnout by 25%
-
-## Team
-- Mike Johnson - Blockchain Development
-- Nancy Lee - Security Engineering
-- Oscar Brown - UX/UI Design`,
-      category: "web3",
-      status: "completed",
-      team: ["Mike Johnson", "Nancy Lee"],
-      technologies: ["Solidity", "React", "Web3", "TypeScript", "Ethereum"],
-      github: "https://github.com",
-      demo: "https://demo.com",
-      images: [
-        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=300&fit=crop",
-      ],
-      date: "2024-02-05",
-    },
-    {
-      id: 6,
-      title: "AI Health Assistant",
-      description:
-        "Personal health monitoring and recommendation system using machine learning.",
-      long_description: `# AI Health Assistant
-
-![AI Health](https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop)
-
-## Personalized Healthcare Companion
-
-An AI-powered health monitoring system that provides personalized health recommendations, medication reminders, and early warning detection for potential health issues.
-
-## Core Capabilities
-
-### Health Monitoring
-- Vital signs tracking
-- Symptom analysis
-- Medication adherence
-- Activity monitoring
-
-### AI Features
-- Predictive health analytics
-- Personalized recommendations
-- Emergency alert system
-- Health trend analysis
-
-## Technical Stack
-- **Machine Learning**: TensorFlow, Scikit-learn
-- **Mobile**: React Native
-- **Backend**: Python, FastAPI
-- **Database**: PostgreSQL
-- **APIs**: Health data integration
-
-## Impact Metrics
-- 40% reduction in medication errors
-- 30% improvement in treatment adherence
-- Early detection of 85% of potential issues
-- 95% user satisfaction rate
-
-## Team
-- Paul Garcia - AI/ML Engineering
-- Quinn Taylor - Mobile Development
-- Rachel Kim - Healthcare Analytics`,
-      category: "ai-ml",
-      status: "in-progress",
-      team: ["Paul Garcia", "Quinn Taylor"],
-      technologies: [
-        "TensorFlow",
-        "React Native",
-        "Node.js",
-        "Python",
-        "PostgreSQL",
-      ],
-      github: "https://github.com",
-      demo: null,
-      images: [
-        "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop",
-        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-      ],
-      date: "2024-03-01",
-    },
-  ];
-
-  const categories = [
-    { id: "all", name: "All Projects", count: prototypes.length },
-    {
-      id: "iot",
-      name: "IoT",
-      count: prototypes.filter((p) => p.category === "iot").length,
-    },
-    {
-      id: "robotics",
-      name: "Robotics",
-      count: prototypes.filter((p) => p.category === "robotics").length,
-    },
-    {
-      id: "ai-ml",
-      name: "AI/ML",
-      count: prototypes.filter((p) => p.category === "ai-ml").length,
-    },
-    {
-      id: "sustainability",
-      name: "Sustainability",
-      count: prototypes.filter((p) => p.category === "sustainability").length,
-    },
-    {
-      id: "education",
-      name: "Education",
-      count: prototypes.filter((p) => p.category === "education").length,
-    },
-    {
-      id: "web3",
-      name: "Web3",
-      count: prototypes.filter((p) => p.category === "web3").length,
-    },
-  ];
-
-  const statusColors = {
-    completed:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-    "in-progress":
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    planning:
-      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  // Use statusMap from content or fallback
+  const statusColors = featuredContent.statusMap || {
+    completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    "in-progress": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    planning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
   };
 
-  const filteredPrototypes = prototypes.filter((prototype) => {
-    const matchesSearch =
-      prototype.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prototype.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || prototype.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Categories based on actual prototype categories
+  const categories = useMemo(() => {
+    const allCategories = [
+      { id: "all", name: "All Projects", count: prototypes.length }
+    ];
+
+    // Extract unique categories from prototypes
+    const uniqueCategories = [...new Set(prototypes
+      .map(p => p?.category)
+      .filter(Boolean)
+    )];
+
+    // Create category entries
+    const categoryEntries = uniqueCategories.map(category => ({
+      id: category,
+      name: category.charAt(0).toUpperCase() + category.slice(1),
+      count: prototypes.filter(p => p?.category === category).length
+    }));
+
+    return [...allCategories, ...categoryEntries];
+  }, [prototypes]);
+
+  // Filtered prototypes with safe access
+  const filteredPrototypes = useMemo(() => 
+    prototypes.filter((prototype) => {
+      if (!prototype) return false;
+      
+      const matchesSearch =
+        prototype.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        prototype.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" || prototype.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    }),
+  [prototypes, searchTerm, selectedCategory]
+  );
 
   const openOverlay = (prototype) => {
     setSelectedPrototype(prototype);
@@ -592,6 +274,19 @@ An AI-powered health monitoring system that provides personalized health recomme
     document.body.style.overflow = "unset";
   };
 
+  // No data state
+  if (prototypes.length === 0) {
+    return (
+      <section className={`min-h-screen py-20 flex items-center justify-center ${sectionBg}`}>
+        <div className="text-center">
+          <p className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+            No projects available at the moment.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={`relative w-full min-h-screen py-20 ${sectionBg}`} id="projects">
       <div className="relative z-10 px-4 max-w-7xl mx-auto">
@@ -602,7 +297,7 @@ An AI-powered health monitoring system that provides personalized health recomme
           transition={{ duration: 0.7 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          Featured{" "}
+          {featuredContent.heading || "Featured Projects"}{" "}
           <span
             className={`bg-gradient-to-r ${
               isDark ? "from-blue-400 to-cyan-400" : "from-blue-600 to-cyan-600"
@@ -619,8 +314,7 @@ An AI-powered health monitoring system that provides personalized health recomme
           transition={{ duration: 0.7, delay: 0.2 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          Explore groundbreaking prototypes developed by our talented student
-          innovators
+          {featuredContent.subheading || "Explore groundbreaking prototypes developed by our talented student innovators"}
         </motion.p>
 
         {/* Search and Filter Bar */}
@@ -634,7 +328,7 @@ An AI-powered health monitoring system that provides personalized health recomme
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
-              placeholder="Search projects..."
+              placeholder={featuredContent.searchPlaceholder || "Search projects..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -644,9 +338,7 @@ An AI-powered health monitoring system that provides personalized health recomme
             {categories.map((category) => (
               <Button
                 key={category.id}
-                variant={
-                  selectedCategory === category.id ? "default" : "outline"
-                }
+                variant={selectedCategory === category.id ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category.id)}
                 className="whitespace-nowrap"
               >
@@ -676,23 +368,23 @@ An AI-powered health monitoring system that provides personalized health recomme
                 {/* Project Image */}
                 <div className="relative h-48 overflow-hidden rounded-t-lg">
                   <img
-                    src={prototype.images[0]}
-                    alt={prototype.title}
+                    src={prototype.images?.[0]}
+                    alt={prototype.title || "Project image"}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                   <div className="absolute top-3 right-3">
-                    <Badge className={statusColors[prototype.status]}>
-                      {prototype.status.replace("-", " ")}
+                    <Badge className={statusColors[prototype.status] || statusColors.planning}>
+                      {prototype.status?.replace("-", " ") || "Unknown"}
                     </Badge>
                   </div>
                 </div>
 
                 <CardHeader className="pb-3">
                   <CardTitle className={`text-xl mb-2 ${titleColor}`}>
-                    {prototype.title}
+                    {prototype.title || "Untitled Project"}
                   </CardTitle>
                   <CardDescription className={textColor}>
-                    {prototype.description}
+                    {prototype.description || "No description available"}
                   </CardDescription>
                 </CardHeader>
 
@@ -701,18 +393,22 @@ An AI-powered health monitoring system that provides personalized health recomme
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      {prototype.team.join(", ")}
+                      {prototype.team?.join(", ") || "No team members"}
                     </span>
                   </div>
 
                   {/* Technologies */}
                   <div className="flex flex-wrap gap-1">
-                    {prototype.technologies.map((tech) => (
+                    {prototype.technologies?.map((tech) => (
                       <Badge key={tech} variant="outline" className="text-xs">
                         <Tag className="w-3 h-3 mr-1" />
                         {tech}
                       </Badge>
-                    ))}
+                    )) || (
+                      <Badge variant="outline" className="text-xs">
+                        No technologies listed
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
 
@@ -770,7 +466,7 @@ An AI-powered health monitoring system that provides personalized health recomme
           ))}
         </div>
 
-        {filteredPrototypes.length === 0 && (
+        {filteredPrototypes.length === 0 && prototypes.length > 0 && (
           <motion.div
             className="text-center py-12"
             initial={{ opacity: 0 }}
@@ -779,8 +475,7 @@ An AI-powered health monitoring system that provides personalized health recomme
             viewport={{ once: true, margin: "-100px" }}
           >
             <p className={`text-lg ${textColor}`}>
-              No projects found matching your criteria. Try adjusting your
-              search filters.
+              {featuredContent.noResults || "No projects found matching your criteria. Try adjusting your search filters."}
             </p>
           </motion.div>
         )}
@@ -811,10 +506,10 @@ An AI-powered health monitoring system that provides personalized health recomme
 
               <div className="pr-12">
                 <h2 className="text-3xl font-bold mb-2">
-                  {selectedPrototype.title}
+                  {selectedPrototype.title || "Untitled Project"}
                 </h2>
                 <p className="text-blue-100 text-lg">
-                  {selectedPrototype.description}
+                  {selectedPrototype.description || "No description available"}
                 </p>
               </div>
             </div>
@@ -825,17 +520,22 @@ An AI-powered health monitoring system that provides personalized health recomme
                 {/* Image Gallery */}
                 <div className="mb-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {selectedPrototype.images.map((image, index) => (
+                    {selectedPrototype.images?.map((image, index) => (
                       <div key={index} className="rounded-lg overflow-hidden">
                         <img
                           src={image}
-                          alt={`${selectedPrototype.title} - Image ${
-                            index + 1
-                          }`}
+                          alt={`${selectedPrototype.title || "Project"} - Image ${index + 1}`}
                           className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
                         />
                       </div>
-                    ))}
+                    )) || (
+                      <div className="col-span-3 text-center py-8">
+                        <p className="text-gray-500">No images available</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -902,7 +602,7 @@ An AI-powered health monitoring system that provides personalized health recomme
                       ),
                     }}
                   >
-                    {selectedPrototype.long_description}
+                    {selectedPrototype.longDescription || selectedPrototype.long_description || "No detailed description available."}
                   </ReactMarkdown>
                 </div>
 
@@ -914,7 +614,7 @@ An AI-powered health monitoring system that provides personalized health recomme
                       Team Members
                     </h3>
                     <div className="space-y-2">
-                      {selectedPrototype.team.map((member, index) => (
+                      {selectedPrototype.team?.map((member, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-2 text-sm"
@@ -924,7 +624,9 @@ An AI-powered health monitoring system that provides personalized health recomme
                             {member}
                           </span>
                         </div>
-                      ))}
+                      )) || (
+                        <p className="text-gray-500">No team members listed</p>
+                      )}
                     </div>
                   </div>
 
@@ -934,11 +636,13 @@ An AI-powered health monitoring system that provides personalized health recomme
                       Technologies Used
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {selectedPrototype.technologies.map((tech, index) => (
+                      {selectedPrototype.technologies?.map((tech, index) => (
                         <Badge key={index} variant="secondary">
                           {tech}
                         </Badge>
-                      ))}
+                      )) || (
+                        <Badge variant="secondary">No technologies listed</Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -987,7 +691,11 @@ An AI-powered health monitoring system that provides personalized health recomme
 
 const CategoriesSection = () => {
   const { theme } = useTheme();
+  const { content } = useContent();
   const isDark = theme === "dark";
+
+  const categoriesContent = content?.all_prototypes?.categories || {};
+  const categories = categoriesContent.cards || [];
 
   const sectionBg = isDark
     ? "bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900"
@@ -999,51 +707,6 @@ const CategoriesSection = () => {
 
   const titleColor = isDark ? "text-white" : "text-gray-900";
   const textColor = isDark ? "text-gray-300" : "text-gray-700";
-
-  const categories = [
-    {
-      title: "Internet of Things",
-      description: "Connected devices and smart systems",
-      icon: "📱",
-      count: "12 Projects",
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      title: "Artificial Intelligence",
-      description: "Machine learning and intelligent systems",
-      icon: "🤖",
-      count: "8 Projects",
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      title: "Robotics",
-      description: "Automated systems and mechanical innovation",
-      icon: "⚙️",
-      count: "6 Projects",
-      gradient: "from-green-500 to-teal-500",
-    },
-    {
-      title: "Sustainability",
-      description: "Eco-friendly and green technology",
-      icon: "🌱",
-      count: "9 Projects",
-      gradient: "from-yellow-500 to-orange-500",
-    },
-    {
-      title: "Healthcare Tech",
-      description: "Medical devices and health solutions",
-      icon: "🏥",
-      count: "7 Projects",
-      gradient: "from-red-500 to-pink-500",
-    },
-    {
-      title: "Education Tech",
-      description: "Learning platforms and educational tools",
-      icon: "🎓",
-      count: "5 Projects",
-      gradient: "from-indigo-500 to-purple-500",
-    },
-  ];
 
   return (
     <section
@@ -1057,7 +720,7 @@ const CategoriesSection = () => {
           transition={{ duration: 0.7 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          Project{" "}
+          {categoriesContent.heading || "Project"}{" "}
           <span
             className={`bg-gradient-to-r ${
               isDark
@@ -1100,7 +763,12 @@ const CategoriesSection = () => {
 
 const ShowcaseSection = () => {
   const { theme } = useTheme();
+  const { content } = useContent();
   const isDark = theme === "dark";
+
+  const showcaseContent = content?.all_prototypes?.showcase || {};
+  const stats = showcaseContent.stats || [];
+  const summary = showcaseContent.summary || "";
 
   const sectionBg = isDark
     ? "bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900"
@@ -1108,13 +776,6 @@ const ShowcaseSection = () => {
 
   const titleColor = isDark ? "text-white" : "text-gray-900";
   const textColor = isDark ? "text-gray-300" : "text-gray-700";
-
-  const stats = [
-    { number: "50+", label: "Projects Completed" },
-    { number: "200+", label: "Student Innovators" },
-    { number: "15+", label: "Technologies Used" },
-    { number: "10+", label: "Industry Partners" },
-  ];
 
   return (
     <section
@@ -1128,7 +789,7 @@ const ShowcaseSection = () => {
           transition={{ duration: 0.7 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          Innovation{" "}
+          {showcaseContent.heading || "Innovation"}{" "}
           <span
             className={`bg-gradient-to-r ${
               isDark
@@ -1170,14 +831,16 @@ const ShowcaseSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           <p className={`text-xl max-w-3xl mx-auto mb-8 ${textColor}`}>
-            Our students have developed innovative solutions that address
-            real-world challenges, from environmental sustainability to
-            healthcare and education technology.
+            {summary}
           </p>
-          <Button size="lg">
-            View All Projects
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Button>
+          {showcaseContent.cta && (
+            <Button size="lg" asChild>
+              <Link href={showcaseContent.cta.href || "#"}>
+                {showcaseContent.cta.label || "View All Projects"}
+                <ExternalLink className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+          )}
         </motion.div>
       </div>
     </section>
@@ -1186,7 +849,12 @@ const ShowcaseSection = () => {
 
 const GetInvolvedSection = () => {
   const { theme } = useTheme();
+  const { content } = useContent();
   const isDark = theme === "dark";
+
+  const getInvolvedContent = content?.all_prototypes?.getInvolved || {};
+  const steps = getInvolvedContent.steps || [];
+  const summary = getInvolvedContent.summary || "";
 
   const sectionBg = isDark
     ? "bg-gradient-to-br from-slate-900 via-orange-900/20 to-slate-900"
@@ -1198,33 +866,6 @@ const GetInvolvedSection = () => {
 
   const titleColor = isDark ? "text-white" : "text-gray-900";
   const textColor = isDark ? "text-gray-300" : "text-gray-700";
-
-  const steps = [
-    {
-      step: "01",
-      title: "Share Your Idea",
-      description: "Present your innovative concept to our team",
-      icon: "💡",
-    },
-    {
-      step: "02",
-      title: "Get Resources",
-      description: "Access our labs, equipment, and mentorship",
-      icon: "🛠️",
-    },
-    {
-      step: "03",
-      title: "Build & Iterate",
-      description: "Develop your prototype with expert guidance",
-      icon: "🚀",
-    },
-    {
-      step: "04",
-      title: "Showcase",
-      description: "Present your project to the community",
-      icon: "🏆",
-    },
-  ];
 
   return (
     <section
@@ -1238,7 +879,7 @@ const GetInvolvedSection = () => {
           transition={{ duration: 0.7 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          Get{" "}
+          {getInvolvedContent.heading || "Get"}{" "}
           <span
             className={`bg-gradient-to-r ${
               isDark
@@ -1280,16 +921,23 @@ const GetInvolvedSection = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           <p className={`text-xl max-w-3xl mx-auto mb-8 ${textColor}`}>
-            Ready to turn your idea into reality? Join our community of
-            innovators and start building the future today.
+            {summary}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-orange-600 hover:bg-orange-700">
-              Start Your Project
-            </Button>
-            <Button variant="outline" size="lg">
-              Join as Mentor
-            </Button>
+            {getInvolvedContent.primaryCta && (
+              <Button size="lg" className="bg-orange-600 hover:bg-orange-700" asChild>
+                <Link href={getInvolvedContent.primaryCta.href || "#"}>
+                  {getInvolvedContent.primaryCta.label || "Start Your Project"}
+                </Link>
+              </Button>
+            )}
+            {getInvolvedContent.secondaryCta && (
+              <Button variant="outline" size="lg" asChild>
+                <Link href={getInvolvedContent.secondaryCta.href || "#"}>
+                  {getInvolvedContent.secondaryCta.label || "Join as Mentor"}
+                </Link>
+              </Button>
+            )}
           </div>
         </motion.div>
       </div>

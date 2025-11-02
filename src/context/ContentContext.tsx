@@ -1,8 +1,13 @@
 // contexts/ContentContext.tsx
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 interface AllContent {
   hero: any;
@@ -10,7 +15,9 @@ interface AllContent {
   services: any;
   history: any;
   prototypes: any;
+  all_prototypes: any;
   team: any;
+  full_team: any;
   aboutpg: any;
 }
 
@@ -30,8 +37,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     services: null,
     history: null,
     prototypes: null,
-    team: null, 
-    aboutpg: null
+    all_prototypes: [],
+    team: null,
+    full_team: null,
+    aboutpg: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,17 +49,18 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Define all content files to fetch
       const contentFiles = [
-        { key: 'hero', path: '/content/home/hero.json' },
-        { key: 'about', path: '/content/home/about.json' },
-        { key: 'services', path: '/content/home/services.json' },
-        { key: 'history', path: '/content/home/history.json' },
-        { key: 'prototypes', path: '/content/home/prototypes.json' },
-        { key: 'team', path: '/content/home/team.json' },
-        { key: 'aboutpg', path: '/content/about/main.json' },
-
+        { key: "hero", path: "/content/home/hero.json" },
+        { key: "about", path: "/content/home/about.json" },
+        { key: "services", path: "/content/home/services.json" },
+        { key: "history", path: "/content/home/history.json" },
+        { key: "prototypes", path: "/content/home/prototypes.json" },
+        { key: "all_prototypes", path: "/content/prototype/main.json" },
+        { key: "team", path: "/content/home/team.json" },
+        { key: "full_team", path: "/content/about/full_team.json" },
+        { key: "aboutpg", path: "/content/about/main.json" },
       ];
 
       // Fetch all content files in parallel
@@ -68,7 +78,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       });
 
       const results = await Promise.all(fetchPromises);
-      
+
       // Combine all results into single content object
       const newContent: AllContent = { ...content };
       let hasErrors = false;
@@ -85,11 +95,14 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       setContent(newContent);
 
       if (hasErrors) {
-        setError('Some content failed to load. Please check console for details.');
+        setError(
+          "Some content failed to load. Please check console for details."
+        );
       }
-
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error loading content');
+      setError(
+        err instanceof Error ? err.message : "Unknown error loading content"
+      );
     } finally {
       setLoading(false);
     }
@@ -104,12 +117,14 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ContentContext.Provider value={{ 
-      content, 
-      loading, 
-      error, 
-      refreshContent 
-    }}>
+    <ContentContext.Provider
+      value={{
+        content,
+        loading,
+        error,
+        refreshContent,
+      }}
+    >
       {children}
     </ContentContext.Provider>
   );
@@ -118,7 +133,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 export function useContent() {
   const context = useContext(ContentContext);
   if (context === undefined) {
-    throw new Error('useContent must be used within a ContentProvider');
+    throw new Error("useContent must be used within a ContentProvider");
   }
   return context;
 }
