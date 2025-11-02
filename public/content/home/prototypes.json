@@ -1,19 +1,19 @@
 {
   "prototypes": [
     {
-      "title": "Smart Agriculture System",
-      "description": "An automatic system for monitoring and optimising crop growth.",
-      "category": "IoT & Automation"
+      "title": "Inflatable Wound Shield",
+      "description": "A self-inflating wound-protective device that shields injured or sutured skin from external impact while maintaining a sterile healing environment.",
+      "category": "Healthcare & Medical Devices"
     },
     {
-      "title": "Wearable Health Tracker",
-      "description": "A device for tracking vital signs and promoting healing habits.",
-      "category": "Healthcare"
+      "title": "Smart Helmet Strap System",
+      "description": "An intelligent emergency-responsive helmet strap that automatically tightens during an accident to enhance rider safety.",
+      "category": "Safety & IoT"
     },
     {
-      "title": "Sustainable Energy Solution",
-      "description": "A solution for generating clean energy from renewable sources.",
-      "category": "Energy"
+      "title": "Foot Drop Assistive Device",
+      "description": "A shoe-mounted assistive mechanism that helps individuals with impaired dorsiflexion walk more naturally by restoring foot lift during gait.",
+      "category": "Rehabilitation & Assistive Technology"
     }
   ]
 }

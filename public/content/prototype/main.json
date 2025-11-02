@@ -1,0 +1,172 @@
+{
+  "hero": {
+    "title": ["Student", "Prototypes"],
+    "subtitle": "Explore innovative prototypes developed by IIT Jammu students. From healthcare solutions to assistive devices, these projects showcase creativity and real-world impact.",
+    "cta": {
+      "primary": { "label": "View Prototypes", "href": "#projects" },
+      "secondary": { "label": "Our Innovations", "href": "#showcase" }
+    }
+  },
+
+  "featured": {
+    "heading": "Featured Prototypes",
+    "subheading": "Browse through a collection of student-built prototypes from Invention Factory and InventX programs.",
+    "searchPlaceholder": "Search prototypes...",
+    "noResults": "No prototypes found matching your search criteria.",
+    "statusMap": {
+      "completed": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      "in-progress": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      "planning": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+    },
+    "prototypes": [
+      {
+        "id": 1,
+        "title": "Crepe Bandage Applicator",
+        "description": "An automatic applicator that simplifies and standardizes bandage wrapping for medical use.",
+        "longDescription": "# Crepe Bandage Applicator\nA user-friendly device designed to simplify the application of crepe bandages. It ensures uniform pressure and reduces manual effort, especially useful in emergency or clinical settings.",
+        "category": "healthcare",
+        "status": "completed",
+        "team": ["Honey Baranwal", "Mayur Kumar"],
+        "technologies": ["Mechanical Design", "3D Printing"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/crepe-bandage.png"],
+        "date": "2024-06-01"
+      },
+      {
+        "id": 2,
+        "title": "Fluid Flex Sensor",
+        "description": "A flexible, fluid-based motion sensor for wearables and robotics applications.",
+        "longDescription": "# Fluid Flex Sensor\nA next-generation sensor that measures bending and movement using a liquid-conductive path, enabling applications in prosthetics, robotics, and motion capture.",
+        "category": "electronics",
+        "status": "completed",
+        "team": ["Romit Mohane", "Vinati Mehta"],
+        "technologies": ["Sensors", "Embedded Systems"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/flexi-sensor.png"],
+        "date": "2024-06-01"
+      },
+      {
+        "id": 3,
+        "title": "Self Lubricating Tampon",
+        "description": "A comfort-enhanced tampon that self-lubricates during insertion.",
+        "longDescription": "# Self Lubricating Tampon\nInnovative menstrual hygiene product that automatically lubricates when inserted, ensuring comfort and safety while reducing the risk of micro-tears.",
+        "category": "healthcare",
+        "status": "completed",
+        "team": ["Etka Sachan", "Aditya Jaiswal"],
+        "technologies": ["Biomedical Engineering"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/self-lubricating-tampon.png"],
+        "date": "2024-06-01"
+      },
+      {
+        "id": 4,
+        "title": "Toothbrush Sterilizer",
+        "description": "A smart sterilizer that disinfects toothbrushes using mist technology and sensors.",
+        "longDescription": "# Toothbrush Sterilizer\nAn automated sterilization chamber for toothbrushes that uses atomized mist and IR sensors to ensure hygiene and eliminate bacteria effectively.",
+        "category": "healthcare",
+        "status": "completed",
+        "team": ["Abhay Gautam", "Charvi Sharma", "Ameen Al Mehboon"],
+        "technologies": ["Electronics", "Sensors", "Microcontroller"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/toothbrush-sterlizer.pdf"],
+        "date": "2025-01-15"
+      },
+      {
+        "id": 5,
+        "title": "Larvae Extractor",
+        "description": "A medical device for safe extraction of larvae during myiasis treatment.",
+        "longDescription": "# Larvae Extractor\nA handheld medical device combining suction and chemical suffocation to remove larvae from animal or human wounds safely and efficiently.",
+        "category": "healthcare",
+        "status": "completed",
+        "team": ["Anneasa Manna", "Parv Kathpal", "Sudhanshu Kumar"],
+        "technologies": ["Biomedical Device", "Embedded Systems"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/larvae.pdf"],
+        "date": "2025-02-01"
+      },
+      {
+        "id": 6,
+        "title": "Smart Helmet Strap System",
+        "description": "An emergency-triggered tightening helmet strap system for safety during accidents.",
+        "longDescription": "# Smart Helmet Strap System\nDetects sudden impact using acceleration sensors and automatically tightens the helmet strap to prevent dislodging during collisions.",
+        "category": "safety",
+        "status": "in-progress",
+        "team": ["Kush Kapoor", "Arnav Varshney", "Tripti Rani"],
+        "technologies": ["Sensors", "Mechanics", "Embedded Systems"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/helmat-strap.jpg"],
+        "date": "2025-02-10"
+      },
+      {
+        "id": 7,
+        "title": "Assistive CPR Device",
+        "description": "A manual chest compression aid providing real-time feedback on CPR quality.",
+        "longDescription": "# Assistive CPR Device\nPortable, sensor-based CPR tool offering real-time feedback on depth, force, and frequency — improving first-aid training and emergency response.",
+        "category": "medical",
+        "status": "completed",
+        "team": ["Aditya Agrawal", "Manashri Vashishtha", "Nakshat Thakkar"],
+        "technologies": ["Sensors", "Mechanics", "Embedded Systems"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/CPR-assistance.pdf"],
+        "date": "2025-03-01"
+      },
+      {
+        "id": 8,
+        "title": "Fire Extinguisher Training Simulator",
+        "description": "Water-based extinguisher replica for hands-on fire safety training.",
+        "longDescription": "# Fire Extinguisher Training Simulator\nAn Arduino-based training extinguisher replicating the behavior of a real one — allowing safe, repeatable fire safety practice sessions.",
+        "category": "education",
+        "status": "completed",
+        "team": ["Aman Nagar", "Kriti Puri"],
+        "technologies": ["Arduino", "Sensors", "Simulation"],
+        "github": null,
+        "demo": null,
+        "images": ["http://72.60.102.111:8000/media/uploads/fire-extingusher.pdf"],
+        "date": "2025-03-10"
+      }
+    ]
+  },
+
+  "categories": {
+    "heading": "Prototype Categories",
+    "cards": [
+      { "title": "Healthcare", "description": "Medical devices and health-focused innovations", "icon": "🏥", "count": "7 Projects", "gradient": "from-red-500 to-pink-500" },
+      { "title": "Electronics", "description": "Smart and sensor-based systems", "icon": "🔋", "count": "3 Projects", "gradient": "from-blue-500 to-cyan-500" },
+      { "title": "Mechanical Design", "description": "Innovative mechanical systems and products", "icon": "⚙️", "count": "4 Projects", "gradient": "from-green-500 to-teal-500" },
+      { "title": "Safety & Assistive Tech", "description": "Devices that enhance safety and accessibility", "icon": "🦺", "count": "2 Projects", "gradient": "from-yellow-500 to-orange-500" },
+      { "title": "Education & Training", "description": "Interactive learning and training devices", "icon": "🎓", "count": "1 Project", "gradient": "from-indigo-500 to-purple-500" }
+    ]
+  },
+
+  "showcase": {
+    "heading": "Innovation Showcase",
+    "stats": [
+      { "number": "20+", "label": "Prototypes Built" },
+      { "number": "50+", "label": "Student Innovators" },
+      { "number": "10+", "label": "Technologies Used" },
+      { "number": "5+", "label": "Partner Programs" }
+    ],
+    "summary": "Through Invention Factory and InventX, IIT Jammu students continue to develop impactful solutions to real-world challenges in healthcare, safety, and sustainability.",
+    "cta": { "label": "View All Projects", "href": "#" }
+  },
+
+  "getInvolved": {
+    "heading": "Join the Innovation Movement",
+    "summary": "Have an idea that can make a difference? Get mentorship, resources, and lab access to bring your prototype to life.",
+    "steps": [
+      { "step": "01", "title": "Submit Your Idea", "description": "Pitch your concept to our innovation cell", "icon": "💡" },
+      { "step": "02", "title": "Collaborate & Design", "description": "Form a team and plan your prototype", "icon": "🛠️" },
+      { "step": "03", "title": "Build & Test", "description": "Use campus labs to create your working model", "icon": "⚙️" },
+      { "step": "04", "title": "Showcase & Scale", "description": "Demonstrate your innovation at InventX or IF", "icon": "🚀" }
+    ],
+    "primaryCta": { "label": "Start a Project", "href": "#" },
+    "secondaryCta": { "label": "Mentor a Team", "href": "#" }
+  }
+}

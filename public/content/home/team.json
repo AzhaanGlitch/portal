@@ -1,36 +1,71 @@
 {
-    "core_members": [
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "Founder & Lead Engineer",
-            "image": "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=1000&q=80"
-        },
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "AI & Robotics Specialist",
-            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
-        },
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "AI & Robotics Specialist",
-            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
-        },
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "AI & Robotics Specialist",
-            "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=1000&q=80"
-        }
-    ],
-    "club_heads": [
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "Full Stack Developer",
-            "image": "https://images.unsplash.com/photo-1603415526960-f8f0a7090f88?auto=format&fit=crop&w=1000&q=80"
-        },
-        {
-            "name": "Ashutosh Vishwakarma",
-            "role": "Design & UI/UX",
-            "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1000&q=80"
-        }
-    ]
+  "core_members": [
+    {
+      "name": "Dr Navneet Kumar",
+      "role": "PIC, I2EDC",
+      "image": "http://72.60.102.111:8000/media/uploads/dr-navneet.jpeg"
+    },
+    {
+      "name": "Dr Arvind",
+      "role": "CIO, I2EDC",
+      "image": "http://72.60.102.111:8000/media/uploads/dr-mt-arvind.jpeg"
+    },
+    {
+      "name": "Mohammad Israil",
+      "role": "OIC, ProtoSpace",
+      "image": ""
+    },
+    {
+      "name": "Drish Mahajan",
+      "role": "Manager, ProtoSpace",
+      "image": "http://72.60.102.111:8000/media/uploads/Drish_TL_manager.jpg"
+    },
+    {
+      "name": "Bhavishya",
+      "role": "Manager, Tinkering Lab",
+      "image": "http://72.60.102.111:8000/media/uploads/bhavishya.JPG"
+    },
+    {
+      "name": "Gaurav Tiwari",
+      "role": "President, E-Cell",
+      "image": "http://72.60.102.111:8000/media/uploads/Gaurav_Tiwari.jpg"
+    },
+    {
+      "name": "Bhanu Prakash Mobarasa",
+      "role": "President, BEC",
+      "image": "http://72.60.102.111:8000/media/uploads/bhanu-bec.png"
+    }
+  ],
+  "club_heads": [
+    {
+      "name": "Anjali Thorat",
+      "role": "Head, Tech Team",
+      "image": "http://72.60.102.111:8000/media/uploads/2024pth0116-anjali_thorat.jpeg"
+    },
+    {
+      "name": "Ujjwal",
+      "role": "Head, Creative Team",
+      "image": "http://72.60.102.111:8000/media/uploads/ujjwal.JPG"
+    },
+    {
+      "name": "Anmol Negi",
+      "role": "Head, Outreach Team",
+      "image": "http://72.60.102.111:8000/media/uploads/anmol-outreach.jpeg"
+    },
+    {
+      "name": "Priyanshi Agarwal",
+      "role": "Head, Design & Coverage",
+      "image": "http://72.60.102.111:8000/media/uploads/priyanshi_Agarwal.jpg"
+    },
+    {
+      "name": "Riyaz",
+      "role": "Head, Treasury (ProtoSpace)",
+      "image": "http://72.60.102.111:8000/media/uploads/riyaz-khan.jpg"
+    },
+    {
+      "name": "Aman Kumar",
+      "role": "Head, Training & Curriculum (Tinkering Lab)",
+      "image": "http://72.60.102.111:8000/media/uploads/Aman_Kumar__TL_head.JPG"
+    }
+  ]
 }

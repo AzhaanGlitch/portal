@@ -91,7 +91,8 @@ const ServicesSection = () => {
 
   // Function to render SVG from string
   const renderSVG = (svgString: string) => {
-    return <div dangerouslySetInnerHTML={{ __html: svgString }} />;
+     const fixed = svgString.replace(/className=/g, "class=");
+    return <div dangerouslySetInnerHTML={{ __html: fixed }} />;
   };
 
   // Theme styles
