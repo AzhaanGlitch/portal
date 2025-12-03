@@ -2,25 +2,28 @@
 import api from "@/lib/api";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./OTPPage.module.css";
 import { toast } from "sonner";
-import "./OTPPage.css";
 import { Suspense } from "react";
-
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { Label } from "@/components/ui/label";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Mail, ArrowLeft, Clock, ShieldCheck, RefreshCw } from "lucide-react";
 
 const COUNTDOWN_TIME = 15;
 
 export default function OTPPageWrapper() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-900/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
       <OTPPage />
     </Suspense>
   );
@@ -37,7 +40,6 @@ function OTPPage() {
   const [username, setUsername] = useState<string>("");
   const [isEmailSent, setIsEmailSent] = useState(false);
 
-  // Get username from localStorage safely
   const getUsername = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("i2dcUsername@#12");
@@ -45,7 +47,6 @@ function OTPPage() {
     return null;
   };
 
-  // Initialize username from localStorage on component mount
   useEffect(() => {
     const storedUsername = getUsername();
     if (storedUsername) {
@@ -54,7 +55,6 @@ function OTPPage() {
     }
   }, []);
 
-  // Handle email submission to send OTP
   const handleSendOTP = async () => {
     if (!username || !username.includes("@")) {
       setError("Please enter a valid email address");
@@ -66,10 +66,7 @@ function OTPPage() {
     setError("");
 
     try {
-      const response = await api.post("/accounts/resend-signup-otp/", { 
-        username 
-      });
-
+      const response = await api.post("/accounts/resend-signup-otp/", { username });
       if (response.status === 200 || response.status === 201) {
         setIsEmailSent(true);
         setSuccess("OTP sent to your email successfully!");
@@ -86,7 +83,6 @@ function OTPPage() {
     }
   };
 
-  // Handle OTP verification
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
@@ -120,7 +116,6 @@ function OTPPage() {
       if (response.status === 200) {
         setSuccess("OTP verified successfully! Redirecting...");
         toast.success("OTP verified successfully! Redirecting...");
-        // Clear sensitive data from localStorage
         localStorage.removeItem("i2dcUsername@#12");
         setTimeout(() => {
           router.push("/auth");
@@ -134,7 +129,6 @@ function OTPPage() {
     }
   };
 
-  // Handle resend OTP
   const handleResendOTP = async () => {
     const currentUsername = getUsername() || username;
     if (!currentUsername) {
@@ -147,17 +141,13 @@ function OTPPage() {
     setError("");
 
     try {
-      const response = await api.post(
-        "/accounts/resend-signup-otp/",
-        { username: currentUsername }
-      );
-
+      const response = await api.post("/accounts/resend-signup-otp/", { username: currentUsername });
       if (response.status === 200 || response.status === 201) {
         setSuccess("New OTP sent to your email");
         toast.success("New OTP sent to your email");
         setCountdown(COUNTDOWN_TIME);
         setCanResend(false);
-        setOtp(""); // Clear existing OTP
+        setOtp("");
       }
     } catch (error: any) {
       setError(error.response?.data?.message || "Failed to resend OTP. Please try again.");
@@ -167,24 +157,19 @@ function OTPPage() {
     }
   };
 
-  // Handle OTP change
   const handleOtpChange = (value: string) => {
     setOtp(value);
-    setError(""); // Clear error when user starts typing
-
-    // Auto-submit when OTP is complete and email is already sent
+    setError("");
     if (value.length === 6 && isEmailSent) {
       handleSubmit();
     }
   };
 
-  // Handle email input change
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
     setError("");
   };
 
-  // Countdown timer for resend OTP
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -194,138 +179,178 @@ function OTPPage() {
     }
   }, [countdown]);
 
-  const spans = new Array(200).fill(0);
-
   return (
-    <div className="otp-container">
-      <section className={styles.section}>
-        {spans.map((_, index) => (
-          <span key={index} className={styles.span}></span>
-        ))}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-900/20 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <ShieldCheck className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            {isEmailSent ? "Verify OTP" : "Verify Email"}
+          </h1>
+          <p className="text-muted-foreground">
+            {isEmailSent 
+              ? "Enter the verification code sent to your email"
+              : "Enter your email to receive a verification code"
+            }
+          </p>
+        </div>
 
-        <div className={styles.container}>
-          <div className={styles.formContainer}>
-            <form onSubmit={handleSubmit}>
-              <h1>{isEmailSent ? "Verify OTP" : "Verify Email"}</h1>
-              <p className="otp-instructions">
+        <Card className="border-border/50 shadow-xl">
+          <form onSubmit={handleSubmit}>
+            <CardHeader>
+              <CardTitle className="text-center">
+                {isEmailSent ? "Check Your Email" : "Email Verification"}
+              </CardTitle>
+              <CardDescription className="text-center">
                 {isEmailSent 
-                  ? `Enter the 6-digit code sent to ${username}`
-                  : "Enter your Email ID to send verification code"
+                  ? `We've sent a 6-digit code to ${username}`
+                  : "We'll send you a verification code"
                 }
-              </p>
+              </CardDescription>
+            </CardHeader>
 
+            <CardContent className="space-y-6">
               {!isEmailSent ? (
-                <Input
-                  type="email"
-                  name="username"
-                  className="border-gray-700"
-                  value={username}
-                  onChange={handleEmailChange}
-                  placeholder="Enter your email"
-                  disabled={loading}
-                />
-              ) : (
-                <div className="text-center text-sm text-gray-600 mb-4">
-                  {username} 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEmailSent(false);
-                      setOtp("");
-                      setCanResend(false);
-                      setCountdown(COUNTDOWN_TIME);
-                      localStorage.removeItem("i2dcUsername@#12");
-                    }}
-                    className="ml-2 text-blue-500 underline hover:text-blue-700 text-xs"
-                    disabled={loading}
-                  >
-                    Change email
-                  </button>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={username}
+                      onChange={handleEmailChange}
+                      className="pl-10"
+                      disabled={loading}
+                      required
+                    />
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg">
+                    <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <span className="text-sm font-medium">{username}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setIsEmailSent(false);
+                        setOtp("");
+                        setCanResend(false);
+                        setCountdown(COUNTDOWN_TIME);
+                        localStorage.removeItem("i2dcUsername@#12");
+                      }}
+                      className="ml-2 h-6 text-xs"
+                      disabled={loading}
+                    >
+                      Change
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-center block">Enter 6-Digit Code</Label>
+                    <div className="flex justify-center">
+                      <InputOTP
+                        pattern={REGEXP_ONLY_DIGITS}
+                        maxLength={6}
+                        value={otp}
+                        onChange={handleOtpChange}
+                        disabled={loading}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <InputOTPSeparator />
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+                  </div>
+
+                  {canResend ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleResendOTP}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Resend OTP
+                    </Button>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span>Resend code in {countdown}s</span>
+                    </div>
+                  )}
+                </>
               )}
-              <br />
 
               {error && (
-                <div className="otp-error-message">
-                  {error}
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                  <p className="text-sm text-destructive text-center">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="otp-success-message">
-                  {success}
+                <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <p className="text-sm text-green-700 dark:text-green-300 text-center">{success}</p>
                 </div>
               )}
+            </CardContent>
 
-              {isEmailSent && (
-                <div className="otp-inputs-container">
-                  <InputOTP
-                    pattern={REGEXP_ONLY_DIGITS}
-                    maxLength={6}
-                    value={otp}
-                    onChange={handleOtpChange}
-                    disabled={loading}
-                  >
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-              )}
-
-              <button
+            <CardFooter className="flex flex-col space-y-3">
+              <Button
                 type="submit"
+                className="w-full"
                 disabled={loading || (isEmailSent ? otp.length !== 6 : !username)}
-                className={`otp-button ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {loading 
                   ? (isEmailSent ? "Verifying..." : "Sending...") 
                   : (isEmailSent ? "Verify OTP" : "Send OTP")
                 }
-              </button>
+              </Button>
 
-              {isEmailSent && (
-                <div className="otp-resend">
-                  <p>
-                    Didn't receive the code?&nbsp;
-                    {canResend ? (
-                      <button
-                        type="button"
-                        onClick={handleResendOTP}
-                        disabled={loading}
-                        className="text-blue-500 underline hover:text-blue-700 disabled:opacity-50"
-                      >
-                        Resend OTP
-                      </button>
-                    ) : (
-                      <span className="text-gray-600">
-                        Resend in {countdown}s
-                      </span>
-                    )}
-                  </p>
-                </div>
-              )}
-
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => router.push("/auth")}
                 disabled={loading}
-                className={`text-blue-500 underline hover:text-blue-700 disabled:opacity-50 mt-2`}
+                className="w-full"
               >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Login
-              </button>
-            </form>
-          </div>
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+
+        {/* Help Text */}
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <p>
+            Didn't receive the code? Check your spam folder or{' '}
+            <button 
+              onClick={handleResendOTP} 
+              disabled={!canResend || loading}
+              className="text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              request a new one
+            </button>
+          </p>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
