@@ -7,7 +7,6 @@ import Link from "next/link";
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
-import LiquidEther from "../animations/LiquidEther/LiquidEther";
 import { useTheme } from "next-themes";
 import HistorySection from "./HistorySection";
 import EventsSection from "./EventSection";
@@ -192,7 +191,6 @@ export const HeroSection = () => {
     <section className="relative w-full h-screen overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
-        <LiquidEther />
       </div>
 
       {/* Hero Content */}
