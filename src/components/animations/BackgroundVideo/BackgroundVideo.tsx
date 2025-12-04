@@ -24,11 +24,22 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full pointer-events-none">
+    <div 
+      className="fixed left-0 w-full pointer-events-none" 
+      style={{ 
+        top: '25%', 
+        height: '75%',
+        zIndex: 0
+      }}
+    >
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
-        style={{ opacity }}
+        style={{ 
+          opacity,
+          borderTopLeftRadius: '2rem',
+          borderTopRightRadius: '2rem'
+        }}
         autoPlay
         loop
         muted

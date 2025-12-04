@@ -1,4 +1,4 @@
-// Hero.tsx - Updated version
+// Hero.tsx - Fixed version with proper null checks
 "use client";
 
 import { motion } from "framer-motion";
@@ -7,94 +7,18 @@ import Link from "next/link";
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
-import { useTheme } from "next-themes";
 import HistorySection from "./HistorySection";
 import EventsSection from "./EventSection";
 import { useContent } from "@/context/ContentContext";
+
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id);
   if (el) {
     el.scrollIntoView({ behavior: "smooth" });
   }
 };
+
 export default function HomePage() {
-  const [currentSection, setCurrentSection] = useState(0);
-  const isScrolling = useRef(false);
-  const sections = useRef<HTMLElement[]>([]);
-
-  // Register sections
-  useEffect(() => {
-    const updateSections = () => {
-      sections.current = Array.from(document.querySelectorAll("section"));
-    };
-    updateSections();
-    window.addEventListener("resize", updateSections);
-    return () => window.removeEventListener("resize", updateSections);
-  }, []);
-
-  // Handle scroll + keyboard
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      if (isScrolling.current) return;
-
-      isScrolling.current = true;
-
-      if (e.deltaY > 0) {
-        setCurrentSection((prev) =>
-          Math.min(prev + 1, sections.current.length - 1)
-        );
-      } else {
-        setCurrentSection((prev) => Math.max(prev - 1, 0));
-      }
-
-      setTimeout(() => {
-        isScrolling.current = false;
-      }, 100);
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isScrolling.current) return;
-
-      if (e.key === "ArrowDown" || e.key === "PageDown") {
-        e.preventDefault();
-        isScrolling.current = true;
-        setCurrentSection((prev) =>
-          Math.min(prev + 1, sections.current.length - 1)
-        );
-        setTimeout(() => (isScrolling.current = false), 200);
-      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-        e.preventDefault();
-        isScrolling.current = true;
-        setCurrentSection((prev) => Math.max(prev - 1, 0));
-        setTimeout(() => (isScrolling.current = false), 200);
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  // Scroll to the current section
-  useEffect(() => {
-    if (sections.current.length > 0 && sections.current[currentSection]) {
-      isScrolling.current = true;
-      window.scrollTo({
-        top: sections.current[currentSection].offsetTop,
-        behavior: "smooth",
-      });
-
-      setTimeout(() => {
-        isScrolling.current = false;
-      }, 200);
-    }
-  }, [currentSection]);
-
   return (
     <div className="relative">
       <HeroSection />
@@ -109,8 +33,6 @@ export default function HomePage() {
 }
 
 export const HeroSection = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const { content, loading, error } = useContent();
 
   // Loading state
@@ -119,11 +41,7 @@ export const HeroSection = () => {
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p
-            className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}
-          >
-            Loading...
-          </p>
+          <p className="text-lg text-muted-foreground">Loading...</p>
         </div>
       </section>
     );
@@ -134,14 +52,10 @@ export const HeroSection = () => {
     return (
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
         <div className="text-center">
-          <p className={`text-lg text-red-500 mb-4`}>Error loading content</p>
-          <button
+          <p className="text-lg text-destructive mb-4">Error loading content</p>
+          <button 
             onClick={() => window.location.reload()}
-            className={`px-6 py-3 rounded-lg font-semibold ${
-              isDark
-                ? "bg-white/10 text-white border border-white/30"
-                : "bg-gray-100 text-gray-800 border border-gray-300"
-            }`}
+            className="px-6 py-3 rounded-lg font-semibold border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           >
             Retry
           </button>
@@ -156,49 +70,35 @@ export const HeroSection = () => {
       parts: [
         { text: "Innovate.", style: "gradient-blue-purple" },
         { text: "Create.", style: "gradient-green-cyan" },
-        { text: "Transform.", style: "gradient-orange-pink" },
-      ],
+        { text: "Transform.", style: "gradient-orange-pink" }
+      ]
     },
-    description:
-      "The Institute Innovation Entrepreneurship Development Cell (I2EDC) is a hub for student innovators and entrepreneurs. We provide resources, mentorship, and a vibrant community to help you bring your ideas to life.",
+    description: "The Institute Innovation Entrepreneurship Development Cell (I2EDC) is a hub for student innovators and entrepreneurs. We provide resources, mentorship, and a vibrant community to help you bring your ideas to life.",
     buttons: [
       { text: "Explore I2EDC", action: "scroll_to_explore" },
-      { text: "Join Community", action: "navigate_to_auth" },
-    ],
+      { text: "Join Community", action: "navigate_to_auth" }
+    ]
   };
 
-  const getGradientClass = (style: string, isDark: boolean) => {
-    const gradients: { [key: string]: { dark: string; light: string } } = {
-      "gradient-blue-purple": {
-        dark: "from-blue-400 to-purple-600",
-        light: "from-blue-600 to-purple-700",
-      },
-      "gradient-green-cyan": {
-        dark: "from-green-400 to-cyan-600",
-        light: "from-green-600 to-cyan-700",
-      },
-      "gradient-orange-pink": {
-        dark: "from-orange-400 to-pink-600",
-        light: "from-orange-600 to-pink-700",
-      },
+  const getGradientClass = (style: string) => {
+    const gradients: { [key: string]: string } = {
+      "gradient-blue-purple": "from-blue-600 to-purple-700 dark:from-blue-400 dark:to-purple-600",
+      "gradient-green-cyan": "from-green-600 to-cyan-700 dark:from-green-400 dark:to-cyan-600",
+      "gradient-orange-pink": "from-orange-600 to-pink-700 dark:from-orange-400 dark:to-pink-600"
     };
-
-    const gradient = gradients[style] || gradients["gradient-blue-purple"];
-    return isDark ? gradient.dark : gradient.light;
+    
+    return gradients[style] || gradients["gradient-blue-purple"];
   };
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
+        {/* <LiquidEther /> */}
       </div>
 
       {/* Hero Content */}
-      <div
-        className={`relative z-10 h-full flex flex-col justify-center items-center text-center px-6 ${
-          isDark ? "text-white" : "text-gray-900"
-        }`}
-      >
+      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-6 text-foreground">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -209,10 +109,7 @@ export const HeroSection = () => {
             {heroData.headline.parts.map((part: any, index: any) => (
               <span key={index}>
                 <span
-                  className={`bg-gradient-to-r ${getGradientClass(
-                    part.style,
-                    isDark
-                  )} bg-clip-text text-transparent`}
+                  className={`bg-gradient-to-r ${getGradientClass(part.style)} bg-clip-text text-transparent`}
                 >
                   {part.text}
                 </span>
@@ -225,9 +122,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className={`text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
-              isDark ? "text-gray-300" : "text-gray-700"
-            }`}
+            className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-muted-foreground"
           >
             {heroData.description}
           </motion.p>
@@ -245,11 +140,7 @@ export const HeroSection = () => {
                     key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 border ${
-                      isDark
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-400/30 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
-                        : "bg-gradient-to-r from-blue-600 to-purple-700 text-white border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40"
-                    }`}
+                    className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 border bg-gradient-to-r from-blue-600 to-purple-700 dark:from-blue-500 dark:to-purple-600 text-primary-foreground border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 dark:shadow-blue-500/25 dark:hover:shadow-blue-500/40"
                     onClick={() => scrollToSection("explore")}
                   >
                     {button.text}
@@ -261,11 +152,7 @@ export const HeroSection = () => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`px-8 py-4 rounded-lg font-semibold border transition-all duration-300 ${
-                        isDark
-                          ? "bg-transparent text-white border-white/30 hover:bg-white/10"
-                          : "bg-transparent text-gray-800 border-gray-400 hover:bg-gray-100/50"
-                      }`}
+                      className="px-8 py-4 rounded-lg font-semibold border transition-all duration-300 border-border bg-background hover:bg-accent hover:text-accent-foreground"
                     >
                       {button.text}
                     </motion.button>
@@ -288,16 +175,12 @@ export const HeroSection = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className={`w-6 h-10 border-2 rounded-full flex justify-center ${
-            isDark ? "border-white/50" : "border-gray-400"
-          }`}
+          className="w-6 h-10 border-2 rounded-full flex justify-center border-muted-foreground/50"
         >
           <motion.div
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className={`w-1 h-3 rounded-full mt-2 ${
-              isDark ? "bg-white/70" : "bg-gray-600"
-            }`}
+            className="w-1 h-3 rounded-full mt-2 bg-muted-foreground/70"
           />
         </motion.div>
       </motion.div>
@@ -306,25 +189,15 @@ export const HeroSection = () => {
 };
 
 const AboutSection = () => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const { content, loading, error } = useContent();
 
   // Loading state
   if (loading && !content.about) {
     return (
-      <section
-        className={`relative w-full min-h-screen flex items-center justify-center ${
-          isDark
-            ? "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-            : "bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50"
-        }`}
-      >
+      <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p
-            className={`text-lg ${isDark ? "text-gray-300" : "text-gray-700"}`}
-          >
+          <p className="text-lg text-muted-foreground">
             Loading about content...
           </p>
         </div>
@@ -335,24 +208,12 @@ const AboutSection = () => {
   // Error state
   if (error && !content.about) {
     return (
-      <section
-        className={`relative w-full min-h-screen flex items-center justify-center ${
-          isDark
-            ? "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-            : "bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50"
-        }`}
-      >
+      <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
         <div className="text-center">
-          <p className={`text-lg text-red-500 mb-4`}>
-            Error loading about content
-          </p>
-          <button
+          <p className="text-lg text-destructive mb-4">Error loading about content</p>
+          <button 
             onClick={() => window.location.reload()}
-            className={`px-6 py-3 rounded-lg font-semibold ${
-              isDark
-                ? "bg-white/10 text-white border border-white/30"
-                : "bg-gray-100 text-gray-800 border border-gray-300"
-            }`}
+            className="px-6 py-3 rounded-lg font-semibold border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           >
             Retry
           </button>
@@ -361,56 +222,75 @@ const AboutSection = () => {
     );
   }
 
-  // Fallback content if no about data
-  const aboutData = content.about || {
-    title: "Explore I2EDC",
-    subtitle: "Our Offerings",
-    offerings: [
-      {
-        title: "Protospace",
-        description:
-          "A collaborative workspace equipped with tools and resources for prototyping and development.",
-        gradient: "from-blue-500 to-cyan-500",
-        icon: '<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>',
-      },
-      {
-        title: "Tinkering Lab",
-        description:
-          "A hands-on lab for experimenting with electronics, robotics, and IoT.",
-        gradient: "from-purple-500 to-pink-500",
-        icon: '<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>',
-      },
-      {
-        title: "Machine Services",
-        description:
-          "Access to a range of specialized machines for fabrication and manufacturing.",
-        gradient: "from-orange-500 to-red-500",
-        icon: '<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
-      },
-    ],
-  };
+  // FIXED: Safely access nested properties with proper null checks
+  const aboutData = content.about || {};
+  const title = aboutData.title || "Explore I2EDC";
+  const subtitle = aboutData.subtitle || "Our Clubs";
+  
+  // CRITICAL FIX: Ensure clubs is always an array
+  const clubs = Array.isArray(aboutData.clubs) ? aboutData.clubs : [
+    {
+      title: "Protospace & Tinkering Lab",
+      description: "A collaborative workspace equipped with tools and resources for prototyping and development.",
+      gradient: "from-blue-500 to-cyan-500",
+      imageUrl: [],
+      keyEvents: [],
+      highlights: []
+    },
+    {
+      title: "E-Cell",
+      description: "Entrepreneurship Cell fostering innovation and business ideas among students.",
+      gradient: "from-purple-500 to-pink-500",
+      imageUrl: [],
+      keyEvents: [],
+      highlights: []
+    },
+    {
+      title: "BEC",
+      description: "Budding Entrepreneur Club nurturing young entrepreneurs and startup culture.",
+      gradient: "from-orange-500 to-red-500",
+      imageUrl: [],
+      keyEvents: [],
+      highlights: []
+    }
+  ];
 
-  // Theme-based styles
-  const sectionBg = isDark
-    ? "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-    : "bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50";
+  const activities = Array.isArray(aboutData.activities) ? aboutData.activities : [
+    {
+      title: "InventX 2025",
+      description: "Annual innovation challenge showcasing cutting-edge projects and ideas.",
+      images: [],
+      videos: []
+    },
+    {
+      title: "Invention Factory 2024",
+      description: "Hands-on workshop series for product development and prototyping.",
+      images: [],
+      videos: []
+    },
+    {
+      title: "Make-a-Thon",
+      description: "Intensive making competition bringing ideas to life in limited time.",
+      images: [],
+      videos: []
+    }
+  ];
 
-  const cardBg = isDark
-    ? "bg-white/5 backdrop-blur-sm border-white/10 hover:border-white/20"
-    : "bg-white/80 backdrop-blur-sm border-gray-200 hover:border-gray-300";
-
-  const titleColor = isDark ? "text-white" : "text-gray-900";
-  const textColor = isDark ? "text-gray-300" : "text-gray-700";
+  // Default icons for clubs
+  const clubIcons = [
+    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`,
+    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>`,
+    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>`
+  ];
 
   // Function to render SVG from string
   const renderSVG = (svgString: string) => {
-    const fixed = svgString.replace(/className=/g, "class=");
-    return <div dangerouslySetInnerHTML={{ __html: fixed }} />;
+    return <div dangerouslySetInnerHTML={{ __html: svgString }} />;
   };
 
   return (
     <section
-      className={`relative w-full min-h-screen flex items-center justify-center ${sectionBg}`}
+      className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900"
       id="explore"
     >
       <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
@@ -418,45 +298,84 @@ const AboutSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className={`text-4xl md:text-5xl font-bold ${titleColor} mb-4`}
+          className="text-4xl md:text-5xl font-bold text-foreground mb-4"
         >
-          {aboutData.title}
+          {title}
         </motion.h2>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className={`text-lg md:text-xl ${textColor} mb-12 max-w-2xl mx-auto`}
+          className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto"
         >
-          {aboutData.subtitle}
+          {subtitle}
         </motion.p>
 
-        <div className="grid md:grid-cols-4 gap-8">
-          {aboutData.offerings.map((item: any, index: any) => (
+        {/* Clubs Section */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {clubs.map((club: any, index: number) => (
             <motion.div
-              key={item.title}
+              key={club.title || index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className={`rounded-2xl p-8 border transition-all duration-300 hover:shadow-lg ${cardBg}`}
+              className="rounded-2xl p-8 border transition-all duration-300 hover:shadow-lg bg-card/80 backdrop-blur-sm border-border hover:border-border/80"
             >
-              <div className="flex flex-col items-center text-center">
-                <div
-                  className={`w-16 h-16 rounded-xl bg-gradient-to-r ${item.gradient} mb-4 flex items-center justify-center`}
-                >
-                  {renderSVG(item.icon)}
-                </div>
-                <h3 className={`text-xl font-bold ${titleColor} mb-3`}>
-                  {item.title}
-                </h3>
-                <p className={`leading-relaxed ${textColor}`}>
-                  {item.description}
-                </p>
+              <div
+                className={`w-12 h-12 rounded-lg bg-gradient-to-r ${club.gradient || 'from-blue-500 to-cyan-500'} mb-6 flex items-center justify-center`}
+              >
+                {renderSVG(clubIcons[index] || clubIcons[0])}
               </div>
+              <h3 className="text-xl font-bold text-foreground mb-4">
+                {club.title || "Club"}
+              </h3>
+              <p className="leading-relaxed text-muted-foreground mb-4">
+                {club.description || ""}
+              </p>
+              
+              {/* Additional club information */}
+              {club.highlights && Array.isArray(club.highlights) && club.highlights.length > 0 && club.highlights[0] && (
+                <div className="text-sm text-muted-foreground text-left">
+                  <strong>Highlights:</strong>
+                  <ul className="list-disc list-inside mt-1">
+                    {club.highlights.map((highlight: string, i: number) => (
+                      highlight && <li key={i}>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
+
+        {/* Activities Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-center"
+        >
+          <h3 className="text-3xl font-bold text-foreground mb-8">Our Activities</h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {activities.map((activity: any, index: number) => (
+              <motion.div
+                key={activity.title || index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="rounded-xl p-6 border bg-card/60 backdrop-blur-sm border-border hover:shadow-md transition-all duration-300"
+              >
+                <h4 className="text-lg font-semibold text-foreground mb-3">
+                  {activity.title || "Activity"}
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {activity.description || ""}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,13 +1,16 @@
-// contact.jsx
+// contact.tsx
 "use client";
 
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { useState } from "react";
+// Import React to use event types (React.ChangeEvent, React.FormEvent)
+import React from "react"; 
+
+// Assuming these are custom components using ShadCN/ui or similar
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import LiquidEther from "../animations/LiquidEther/LiquidEther";
 
 export default function ContactPage() {
   return (
@@ -19,6 +22,8 @@ export default function ContactPage() {
   );
 }
 
+// --- ContactHeroSection ---
+
 const ContactHeroSection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -26,7 +31,6 @@ const ContactHeroSection = () => {
   return (
     <section className="relative w-full h-screen overflow-hidden">
       <div className="absolute inset-0">
-        <LiquidEther />
       </div>
 
       <div className={`relative z-10 h-full flex flex-col justify-center items-center text-center px-6 ${
@@ -65,6 +69,8 @@ const ContactHeroSection = () => {
   );
 };
 
+// --- ContactFormSection ---
+
 const ContactFormSection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -82,8 +88,12 @@ const ContactFormSection = () => {
   const titleColor = isDark ? "text-white" : "text-gray-900";
   const textColor = isDark ? "text-gray-300" : "text-gray-700";
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => {
+  // FIX: Explicitly type 'e' for change event (Input/Textarea)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => 
+    setForm({ ...form, [e.target.name]: e.target.value });
+    
+  // FIX: Explicitly type 'e' for form submission event
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted", form);
     setSubmitted(true);
@@ -154,6 +164,8 @@ const ContactFormSection = () => {
   );
 };
 
+// --- ContactInfoSection ---
+
 const ContactInfoSection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -214,7 +226,7 @@ const ContactInfoSection = () => {
               viewport={{ once: true, margin: "-100px" }}
               className={`rounded-2xl p-8 border transition-all duration-300 hover:shadow-lg ${cardBg} text-center`}
             >
-              <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${item.gradient} mb-4 flex items-center justify-center text-white text-xl`}>
+              <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${item.gradient} mb-4 flex items-center justify-center text-white text-xl mx-auto`}>
                 {item.icon}
               </div>
               <h3 className={`text-xl font-bold mb-2 ${accentColor}`}>{item.type}</h3>

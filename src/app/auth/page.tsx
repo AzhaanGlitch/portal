@@ -272,9 +272,9 @@ export default function AuthPage() {
     }
     setLoading(true);
     try {
-      console.log('🔵 Attempting login with:', { email }); // Debug log
+      console.log('🔵 Attempting login with:', { email });
       const response = await api.post('/accounts/login/', { email, password });
-      console.log('✅ Login response:', response); // Debug log
+      console.log('✅ Login response:', response);
       
       if (response.status === 200) {
         setReverseCanvasVisible(true);
@@ -286,7 +286,7 @@ export default function AuthPage() {
         }, 1500);
       }
     } catch (error: any) {
-      console.error('❌ Login error:', error); // Debug log
+      console.error('❌ Login error:', error);
       console.error('Error details:', {
         message: error.message,
         response: error?.response?.data,
@@ -305,7 +305,7 @@ export default function AuthPage() {
     }
     setLoading(true);
     try {
-      console.log('🔵 Attempting signup with:', { email, firstName, lastName }); // Debug log
+      console.log('🔵 Attempting signup with:', { email, firstName, lastName });
       const response = await api.post('/accounts/signup/', {
         username: email,
         email,
@@ -313,7 +313,7 @@ export default function AuthPage() {
         first_name: firstName,
         last_name: lastName,
       });
-      console.log('✅ Signup response:', response); // Debug log
+      console.log('✅ Signup response:', response);
       
       if (response.status === 200 || response.status === 201) {
         localStorage.setItem('i2dcUsername@#12', response.data?.username || email);
@@ -325,7 +325,7 @@ export default function AuthPage() {
         }, 1500);
       }
     } catch (error: any) {
-      console.error('❌ Signup error:', error); // Debug log
+      console.error('❌ Signup error:', error);
       console.error('Error details:', {
         message: error.message,
         response: error?.response?.data,
@@ -348,27 +348,27 @@ export default function AuthPage() {
   return (
     <div className="flex w-full flex-col min-h-screen bg-white relative">
       <div className="absolute inset-0 z-0">
-        {/* 🎨 COLOR CHANGE LOCATION 1: Initial Canvas - Change colors prop below */}
+        {/* 🎨 UPDATED: Bigger particles (dotSize increased from 6 to 12) */}
         {initialCanvasVisible && (
           <div className="absolute inset-0">
             <CanvasRevealEffect
               animationSpeed={3}
               containerClassName="bg-white"
-              colors={[[59, 130, 246], [147, 51, 234]]} // Blue to Purple gradient
-              dotSize={6}
+              colors={[[59, 130, 246], [147, 51, 234]]}
+              dotSize={12}
               reverse={false}
             />
           </div>
         )}
         
-        {/* 🎨 COLOR CHANGE LOCATION 2: Reverse Canvas - Change colors prop below */}
+        {/* 🎨 UPDATED: Bigger particles (dotSize increased from 6 to 12) */}
         {reverseCanvasVisible && (
           <div className="absolute inset-0">
             <CanvasRevealEffect
               animationSpeed={4}
               containerClassName="bg-white"
-              colors={[[59, 130, 246], [147, 51, 234]]} // Blue to Purple gradient
-              dotSize={6}
+              colors={[[59, 130, 246], [147, 51, 234]]}
+              dotSize={12}
               reverse={true}
             />
           </div>
@@ -393,7 +393,8 @@ export default function AuthPage() {
                     className="space-y-6 text-center"
                   >
                     <div className="space-y-1">
-                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-black">
+                      {/* 🎨 UPDATED: Added gradient text styling */}
+                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight bg-gradient-to-r from-[#3b82f6] to-[#9333ea] bg-clip-text text-transparent">
                         Welcome To I2EDC
                       </h1>
                       <p className="text-[1.8rem] text-black/70 font-light">Sign-in to your account</p>
@@ -418,11 +419,11 @@ export default function AuthPage() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleEmailContinue()}
-                          className="w-full backdrop-blur-[1px] text-black border border-black/10 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                          className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
                         />
                         <button
                           onClick={handleEmailContinue}
-                          className="absolute right-1.5 top-1.5 text-black w-9 h-9 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors group overflow-hidden"
+                          className="absolute right-1.5 top-1.5 text-black w-9 h-9 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/20 transition-colors group overflow-hidden"
                         >
                           <span className="relative w-full h-full block overflow-hidden">
                             <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-full">
@@ -438,7 +439,6 @@ export default function AuthPage() {
 
                     <p className="text-xs text-black/40 pt-10">
                       By signing up, you agree to the{' '}
-                      <a href="#" className="underline hover:text-black/60">MSA</a>,{' '}
                       <a href="#" className="underline hover:text-black/60">Product Terms</a>,{' '}
                       <a href="#" className="underline hover:text-black/60">Policies</a>,{' '}
                       <a href="#" className="underline hover:text-black/60">Privacy Notice</a>, and{' '}
@@ -513,7 +513,6 @@ export default function AuthPage() {
                     <div className="pt-16">
                       <p className="text-xs text-black/40">
                         By signing up, you agree to the{' '}
-                        <a href="#" className="underline hover:text-black/60">MSA</a>,{' '}
                         <a href="#" className="underline hover:text-black/60">Product Terms</a>,{' '}
                         <a href="#" className="underline hover:text-black/60">Policies</a>,{' '}
                         <a href="#" className="underline hover:text-black/60">Privacy Notice</a>, and{' '}
