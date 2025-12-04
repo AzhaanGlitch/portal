@@ -1,4 +1,3 @@
-// index.tsx (The About Page - Complete Fixed File)
 "use client";
 
 import { motion } from "framer-motion";
@@ -105,7 +104,6 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
-      {/* BackgroundVideo component ensures the video is correctly positioned */}
       <BackgroundVideo opacity={0.3} />
 
       <div
