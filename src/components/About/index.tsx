@@ -1,11 +1,12 @@
-// about.tsx – null-proof, type-safe
+// index.tsx (The About Page - Complete Fixed File)
 "use client";
 
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useContent } from "@/context/ContentContext";
+import { useContent } from "@/context/ContentContext"; 
 import { useState, useEffect, useMemo } from "react";
+import BackgroundVideo from "../animations/BackgroundVideo/BackgroundVideo"; 
 
 /* --------------------- TYPE DEFINITIONS --------------------------- */
 type Gradient = string;
@@ -53,10 +54,25 @@ interface AboutPageData {
   timeline?: Timeline;
   leadership?: Leadership;
 }
+// Team types from TeamSection
+interface TeamMember {
+  name: string;
+  role: string;
+  image?: string;
+  club?: string;
+}
+interface TeamData {
+  core_members?: TeamMember[];
+  ps_tl_members?: TeamMember[];
+  e_cell_members?: TeamMember[];
+  bec_members?: TeamMember[];
+}
+
 
 /* --------------------- SMALL HELPERS ------------------------------ */
 const safeArr = <T,>(v?: T[]): T[] => (Array.isArray(v) ? v : []);
 const safeStr = (v?: string): string => (typeof v === "string" ? v : "");
+
 
 /* --------------------- PAGE SHELL --------------------------------- */
 export default function AboutPage() {
@@ -89,8 +105,8 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-      </div>
+      {/* BackgroundVideo component ensures the video is correctly positioned */}
+      <BackgroundVideo opacity={0.3} />
 
       <div
         className={`relative z-10 h-full flex flex-col justify-center items-center text-center px-6 ${
@@ -168,7 +184,7 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
                   }`}
                 >
                   {secondary.label}
-                </motion.button>
+              </motion.button>
               </Link>
             )}
           </motion.div>
@@ -456,7 +472,7 @@ const HistorySection = ({ heading, milestones }: Timeline) => {
                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, amount: 0.5 }}
                 className={`relative flex flex-col md:flex-row items-center mb-12 md:mb-0 ${
                   index % 2 === 0 ? "md:flex-row-reverse" : ""
                 }`}
@@ -504,32 +520,18 @@ const HistorySection = ({ heading, milestones }: Timeline) => {
 };
 
 /* ------------------- LEADERSHIP ----------------------------------- */
-
-interface TeamMember {
-  name: string;
-  role: string;
-  image?: string;
-  club?: string;
-}
-
-interface TeamData {
-  core_members?: TeamMember[];
-  ps_tl_members?: TeamMember[];
-  e_cell_members?: TeamMember[];
-  bec_members?: TeamMember[];
-}
-
 const TeamSection = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const { content, loading, error } = useContent();
+  // 💥 FIX: Removed 'refetch' from destructuring to fix TypeScript error
+  const { content, loading, error } = useContent(); 
   const [activeClub, setActiveClub] = useState("core");
   const [isInitialized, setIsInitialized] = useState(false);
+  
   // Initialize active club once data is loaded
   useEffect(() => {
     if (!loading && content.full_team && !isInitialized) {
       const teamData = content.full_team as TeamData;
-      console.log("Team",teamData);
       
       const clubs = [
         { key: "core", members: teamData.core_members },
@@ -541,15 +543,21 @@ const TeamSection = () => {
       const firstValidClub = clubs.find(
         (club) => club.members && club.members.length > 0
       );
-      if (firstValidClub && firstValidClub.key !== activeClub) {
+      // Only update if a valid club is found and it's different from current
+      if (firstValidClub && firstValidClub.key !== activeClub) { 
         setActiveClub(firstValidClub.key);
+      } else if (!firstValidClub && activeClub !== "core") {
+         // Fallback if the default 'core' is set but there's no data
+         setActiveClub("core");
       }
       setIsInitialized(true);
     }
-  }, [loading, content.full_team, activeClub, isInitialized]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, content.full_team, isInitialized]); 
 
   // Safe data access with fallbacks
   const teamData = useMemo(
+    // Ensure content.full_team is treated as TeamData, defaulting to empty object
     () => (content.full_team as TeamData) || {},
     [content.full_team]
   );
@@ -724,23 +732,20 @@ const TeamSection = () => {
 
   // Error state
   if (error && !content.full_team) {
-    return (
-      <ErrorState isDark={isDark} onRetry={() => window.location.reload()} />
-    );
+    // FIX: Use window.location.reload as fallback since refetch isn't typed
+    return <ErrorState isDark={isDark} onRetry={() => window.location.reload()} />; 
   }
 
   // No data state
   if (hasNoData) {
-    return (
-      <NoDataState isDark={isDark} onRetry={() => window.location.reload()} />
-    );
+    // FIX: Use window.location.reload as fallback since refetch isn't typed
+    return <NoDataState isDark={isDark} onRetry={() => window.location.reload()} />; 
   }
 
   // No tabs available
   if (clubTabs.length === 0) {
-    return (
-      <NoDataState isDark={isDark} onRetry={() => window.location.reload()} />
-    );
+    // FIX: Use window.location.reload as fallback since refetch isn't typed
+    return <NoDataState isDark={isDark} onRetry={() => window.location.reload()} />;
   }
 
   return (

@@ -10,7 +10,7 @@ interface BackgroundVideoProps {
 
 const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoPath = "/videos/background.mp4",
-  opacity = 0.8,
+  opacity = 0.5, // Adjusted opacity for better text contrast
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -24,21 +24,21 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   }, []);
 
   return (
+    // FIX: Changed from 'fixed' to 'absolute inset-0 w-full h-full' to cover the parent section.
+    // Removed fixed top/height styles.
     <div 
-      className="fixed left-0 w-full pointer-events-none" 
+      className="absolute inset-0 w-full h-full pointer-events-none" 
       style={{ 
-        top: '25%', 
-        height: '75%',
         zIndex: 0
       }}
     >
       <video
         ref={videoRef}
-        className="w-full h-full object-cover"
+        // object-cover ensures the video scales correctly to cover the full container, fixing the "too zoomed" issue.
+        className="w-full h-full object-cover" 
         style={{ 
           opacity,
-          borderTopLeftRadius: '2rem',
-          borderTopRightRadius: '2rem'
+          // Removed original border radius styles to allow full coverage
         }}
         autoPlay
         loop
@@ -47,6 +47,9 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
       >
         <source src={videoPath} type="video/mp4" />
       </video>
+      
+      {/* Optional: Dark overlay for better text contrast */}
+      <div className="absolute inset-0 bg-black/40"></div>
     </div>
   );
 };

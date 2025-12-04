@@ -1,9 +1,11 @@
-// Hero.tsx - Fixed version with proper null checks
+// Home Page index.tsx (With 1/4 content, 3/4 video split)
 "use client";
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+// Importing the fixed BackgroundVideo component
+import BackgroundVideo from "../animations/BackgroundVideo/BackgroundVideo"; 
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
 import TeamSection from "./TeamSection";
@@ -12,7 +14,8 @@ import EventsSection from "./EventSection";
 import { useContent } from "@/context/ContentContext";
 
 const scrollToSection = (id: string) => {
-  const el = document.getElementById(id);
+  const targetId = id === "scroll_to_explore" ? "explore" : id;
+  const el = document.getElementById(targetId);
   if (el) {
     el.scrollIntoView({ behavior: "smooth" });
   }
@@ -35,7 +38,7 @@ export default function HomePage() {
 export const HeroSection = () => {
   const { content, loading, error } = useContent();
 
-  // Loading state
+  // Loading state (omitted for brevity)
   if (loading && !content.hero) {
     return (
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
@@ -47,7 +50,7 @@ export const HeroSection = () => {
     );
   }
 
-  // Error state
+  // Error state (omitted for brevity)
   if (error && !content.hero) {
     return (
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
@@ -64,7 +67,7 @@ export const HeroSection = () => {
     );
   }
 
-  // Fallback content if no hero data
+  // Fallback content (omitted for brevity)
   const heroData = content.hero || {
     headline: {
       parts: [
@@ -91,19 +94,28 @@ export const HeroSection = () => {
   };
 
   return (
+    // Set section to full viewport height (h-screen)
     <section className="relative w-full h-screen overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        {/* <LiquidEther /> */}
+      
+      {/* Video Container & Top Overlay */}
+      <div className="absolute inset-0 w-full h-full">
+        {/* Overlay for the top 1/4th to create visual separation */}
+        <div className="absolute top-0 left-0 w-full h-[25vh] bg-white dark:bg-slate-900/90 z-10"></div>
+        
+        {/* Video component is now absolutely positioned inside, covering the entire section */}
+        <BackgroundVideo opacity={0.5} /> 
       </div>
 
-      {/* Hero Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-6 text-foreground">
+
+      {/* Hero Content - Positioned in the top 1/4th */}
+      <div className="relative z-20 h-full flex flex-col justify-start items-center text-center px-6 text-foreground">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-4xl mx-auto"
+          // CRITICAL: Push content down using top padding to align it in the top 1/4th
+          style={{ paddingTop: '25vh' }}
         >
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             {heroData.headline.parts.map((part: any, index: any) => (
@@ -122,7 +134,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-muted-foreground"
+            className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-gray-700 dark:text-gray-300" 
           >
             {heroData.description}
           </motion.p>
@@ -141,7 +153,7 @@ export const HeroSection = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 border bg-gradient-to-r from-blue-600 to-purple-700 dark:from-blue-500 dark:to-purple-600 text-primary-foreground border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 dark:shadow-blue-500/25 dark:hover:shadow-blue-500/40"
-                    onClick={() => scrollToSection("explore")}
+                    onClick={() => scrollToSection("scroll_to_explore")}
                   >
                     {button.text}
                   </motion.button>
@@ -165,12 +177,12 @@ export const HeroSection = () => {
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator (omitted for brevity) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}
@@ -187,6 +199,7 @@ export const HeroSection = () => {
     </section>
   );
 };
+// ... rest of the file ... (AboutSection, etc.)
 
 const AboutSection = () => {
   const { content, loading, error } = useContent();
