@@ -3,7 +3,6 @@
 
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import LiquidEther from "../animations/LiquidEther/LiquidEther";
 import Link from "next/link";
 import { useContent } from "@/context/ContentContext";
 import { useState, useEffect, useMemo } from "react";
@@ -91,7 +90,6 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
   return (
     <section className="relative w-full h-screen overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
-        <LiquidEther autoDemo />
       </div>
 
       <div
