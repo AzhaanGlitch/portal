@@ -88,7 +88,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative w-full h-screen overflow-hidden ">
       <BackgroundVideo opacity={0.6} />
       
       <div className="absolute top-0 left-0 w-full h-[18vh] bg-background z-10"></div>
@@ -287,7 +287,6 @@ const AboutSection = () => {
       className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900"
       id="explore"
     >
-      {/* NO VIDEO HERE - Just gradient background */}
       <div className="relative z-10 text-center px-6 max-w-6xl mx-auto py-20">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}

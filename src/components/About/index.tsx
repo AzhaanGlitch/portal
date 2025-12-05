@@ -56,7 +56,10 @@ export default function AboutPage() {
   if (!about) return null;
 
   return (
-    <div className="relative">
+    // FIX: Ensure the entire page has a solid, opaque background and higher z-index to fully cover any underlying video.
+    <div className="relative bg-background min-h-screen z-40">
+      {/* Additional full-page overlay to block any background video */}
+      <div className="fixed inset-0 bg-background z-30" />
       <AboutHeroSection {...(about.hero ?? {})} />
       <MissionSection {...(about.mission ?? {})} />
       <LeadershipSection {...(about.leadership ?? {})} />
@@ -74,9 +77,12 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
   if (!titleSafe.length && !subSafe) return null;
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-background via-blue-50/50 to-background dark:via-blue-950/20">
-      {/* NO VIDEO - Just gradient background */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-6 text-foreground">
+    <section 
+      className="relative w-full h-screen overflow-hidden bg-background z-50"
+    >
+      {/* Solid opaque background to ensure no video bleeds through */}
+      <div className="absolute inset-0 bg-background z-40" />
+      <div className="relative z-50 h-full flex flex-col justify-center items-center text-center px-6 text-foreground">
         {!!titleSafe.length && (
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
@@ -145,7 +151,7 @@ const AboutHeroSection = ({ title, subtitle, cta }: Hero) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center text-muted-foreground z-20"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center text-muted-foreground z-60"
       >
         <span className="text-sm mb-2">Scroll to explore</span>
         <motion.div
@@ -175,10 +181,11 @@ const MissionSection = ({ heading, paragraphs, clubs }: Mission) => {
   return (
     <section
       id="about"
-      className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-blue-50/50 to-background dark:via-blue-950/20"
+      className="relative w-full min-h-screen flex items-center justify-center bg-background z-50"
     >
-      {/* NO VIDEO - Just gradient background */}
-      <div className="relative z-10 px-4 max-w-4xl mx-auto py-20">
+      {/* Solid opaque background to ensure no video bleeds through */}
+      <div className="absolute inset-0 bg-background z-40" />
+      <div className="relative z-50 px-4 max-w-4xl mx-auto py-20">
         {!!headingSafe && (
           <motion.h2
             className="text-4xl md:text-5xl font-bold text-center mb-12 text-foreground"
@@ -289,10 +296,11 @@ const LeadershipSection = ({ heading, summary, members }: Leadership) => {
   return (
     <section
       id="team"
-      className="relative w-full min-h-screen flex items-center justify-center py-20 bg-gradient-to-br from-orange-50/80 via-red-50/50 to-pink-50/80 dark:from-slate-900 dark:via-orange-950/20 dark:to-slate-900"
+      className="relative w-full min-h-screen flex items-center justify-center py-20 bg-background z-50"
     >
-      {/* NO VIDEO - Just gradient background */}
-      <div className="relative z-10 px-4 max-w-6xl mx-auto">
+      {/* Solid opaque background to ensure no video bleeds through */}
+      <div className="absolute inset-0 bg-background z-40" />
+      <div className="relative z-50 px-4 max-w-6xl mx-auto">
         {!!headingSafe && (
           <motion.h2
             className="text-4xl md:text-5xl font-bold text-center mb-16 text-foreground"
