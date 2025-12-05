@@ -89,21 +89,19 @@ export const HeroSection = () => {
 
   return (
     <section className="relative w-full h-screen overflow-hidden ">
-      <BackgroundVideo opacity={0.6} />
-      
-      <div className="absolute top-0 left-0 w-full h-[18vh] bg-background z-10"></div>
+      <BackgroundVideo opacity={0.7} />
 
       {/* Hero Content */}
-      <div className="relative z-20 h-full flex flex-col items-center px-6 pt-30">
+      <div className="relative z-20 h-full flex flex-col items-center px-6 pt-70">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="text-center"
       >
-        <div className="inline-block p-4 md:p-6 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-2xl shadow-black/60 mb-8">
+        <div className="inline-block p-4 md:p-6 bg-black/50 backdrop-blur-sm rounded-full border border-white/20 shadow-2xl shadow-black/60 mb-8">
           <h1 
-            className="text-4xl md:text-6xl lg:text-7xl font-bold m-0">
+            className="text-3xl md:text-5xl lg:text-6xl font-bold m-0">
             {heroData.headline.parts.map((part: any, index: any) => (
               <span key={index}>
                 <span
@@ -111,7 +109,7 @@ export const HeroSection = () => {
                 >
                   {part.text}
                 </span>
-                {index < heroData.headline.parts.length - 1 && " "}
+                {index < heroData.headline.parts.length - 1 && " " }
               </span>
             ))}
           </h1>
@@ -195,8 +193,10 @@ const AboutSection = () => {
 
   if (loading && !content.about) {
     return (
-      <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
-        <div className="text-center">
+      <section className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 z-50">
+        {/* Solid opaque background to ensure no video bleeds through */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 z-40" />
+        <div className="relative z-50 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p className="text-lg text-muted-foreground">Loading about content...</p>
         </div>
@@ -206,8 +206,10 @@ const AboutSection = () => {
 
   if (error && !content.about) {
     return (
-      <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
-        <div className="text-center">
+      <section className="relative w-full min-h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 z-50">
+        {/* Solid opaque background to ensure no video bleeds through */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 z-40" />
+        <div className="relative z-50 text-center">
           <p className="text-lg text-destructive mb-4">Error loading about content</p>
           <button 
             onClick={() => window.location.reload()}
@@ -284,10 +286,12 @@ const AboutSection = () => {
 
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900"
+      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center z-50"
       id="explore"
     >
-      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto py-20">
+      {/* Solid opaque background to ensure no video bleeds through */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 z-40" />
+      <div className="relative z-50 text-center px-6 max-w-6xl mx-auto py-20">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

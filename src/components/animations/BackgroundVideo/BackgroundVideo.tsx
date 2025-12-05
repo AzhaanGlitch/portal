@@ -1,4 +1,4 @@
-// BackgroundVideo.tsx - Final Fixed Version
+// BackgroundVideo.tsx - FINAL FIXED VERSION
 "use client";
 
 import { useRef, useEffect } from "react";

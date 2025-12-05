@@ -348,27 +348,25 @@ export default function AuthPage() {
   return (
     <div className="flex w-full flex-col min-h-screen bg-white relative">
       <div className="absolute inset-0 z-0">
-        {/* 🎨 UPDATED: Bigger particles (dotSize increased from 6 to 12) */}
         {initialCanvasVisible && (
           <div className="absolute inset-0">
             <CanvasRevealEffect
               animationSpeed={3}
               containerClassName="bg-white"
               colors={[[59, 130, 246], [147, 51, 234]]}
-              dotSize={12}
+              dotSize={18}
               reverse={false}
             />
           </div>
         )}
         
-        {/* 🎨 UPDATED: Bigger particles (dotSize increased from 6 to 12) */}
         {reverseCanvasVisible && (
           <div className="absolute inset-0">
             <CanvasRevealEffect
               animationSpeed={4}
               containerClassName="bg-white"
               colors={[[59, 130, 246], [147, 51, 234]]}
-              dotSize={12}
+              dotSize={18}
               reverse={true}
             />
           </div>
@@ -393,7 +391,6 @@ export default function AuthPage() {
                     className="space-y-6 text-center"
                   >
                     <div className="space-y-1">
-                      {/* 🎨 UPDATED: Added gradient text styling */}
                       <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight bg-gradient-to-r from-[#3b82f6] to-[#9333ea] bg-clip-text text-transparent">
                         Welcome To I2EDC
                       </h1>
