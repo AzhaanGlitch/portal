@@ -1,10 +1,7 @@
-// Home Page index.tsx (With 1/4 content, 3/4 video split)
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-// Importing the fixed BackgroundVideo component
 import BackgroundVideo from "../animations/BackgroundVideo/BackgroundVideo"; 
 import ServicesSection from "./ServicesSection";
 import PrototypesSection from "./PrototypesSection";
@@ -38,7 +35,6 @@ export default function HomePage() {
 export const HeroSection = () => {
   const { content, loading, error } = useContent();
 
-  // Loading state (omitted for brevity)
   if (loading && !content.hero) {
     return (
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
@@ -50,7 +46,6 @@ export const HeroSection = () => {
     );
   }
 
-  // Error state (omitted for brevity)
   if (error && !content.hero) {
     return (
       <section className="relative w-full h-screen overflow-hidden flex items-center justify-center">
@@ -67,7 +62,6 @@ export const HeroSection = () => {
     );
   }
 
-  // Fallback content (omitted for brevity)
   const heroData = content.hero || {
     headline: {
       parts: [
@@ -94,30 +88,22 @@ export const HeroSection = () => {
   };
 
   return (
-    // Set section to full viewport height (h-screen)
     <section className="relative w-full h-screen overflow-hidden">
+      <BackgroundVideo opacity={0.6} />
       
-      {/* Video Container & Top Overlay */}
-      <div className="absolute inset-0 w-full h-full">
-        {/* Overlay for the top 1/4th to create visual separation */}
-        <div className="absolute top-0 left-0 w-full h-[25vh] bg-white dark:bg-slate-900/90 z-10"></div>
-        
-        {/* Video component is now absolutely positioned inside, covering the entire section */}
-        <BackgroundVideo opacity={0.5} /> 
-      </div>
+      <div className="absolute top-0 left-0 w-full h-[18vh] bg-background z-10"></div>
 
-
-      {/* Hero Content - Positioned in the top 1/4th */}
-      <div className="relative z-20 h-full flex flex-col justify-start items-center text-center px-6 text-foreground">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto"
-          // CRITICAL: Push content down using top padding to align it in the top 1/4th
-          style={{ paddingTop: '25vh' }}
-        >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+      {/* Hero Content */}
+      <div className="relative z-20 h-full flex flex-col items-center px-6 pt-30">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center"
+      >
+        <div className="inline-block p-4 md:p-6 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-2xl shadow-black/60 mb-8">
+          <h1 
+            className="text-4xl md:text-6xl lg:text-7xl font-bold m-0">
             {heroData.headline.parts.map((part: any, index: any) => (
               <span key={index}>
                 <span
@@ -129,55 +115,59 @@ export const HeroSection = () => {
               </span>
             ))}
           </h1>
+        </div>
+      </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-gray-700 dark:text-gray-300" 
-          >
-            {heroData.description}
-          </motion.p>
+        {/* Description - Over video with white text */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-lg md:text-xl lg:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed text-center text-white font-medium drop-shadow-lg"
+          style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+        >
+          {heroData.description}
+        </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          >
-            {heroData.buttons.map((button: any, index: any) => {
-              if (button.action === "scroll_to_explore") {
-                return (
+        {/* Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          {heroData.buttons.map((button: any, index: any) => {
+            if (button.action === "scroll_to_explore") {
+              return (
+                <motion.button
+                  key={index}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-700 text-white border border-blue-500/30 shadow-xl shadow-blue-500/50 hover:shadow-blue-600/60"
+                  onClick={() => scrollToSection("scroll_to_explore")}
+                >
+                  {button.text}
+                </motion.button>
+              );
+            } else if (button.action === "navigate_to_auth") {
+              return (
+                <Link key={index} href="/auth" scroll={false}>
                   <motion.button
-                    key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 border bg-gradient-to-r from-blue-600 to-purple-700 dark:from-blue-500 dark:to-purple-600 text-primary-foreground border-blue-500/30 shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 dark:shadow-blue-500/25 dark:hover:shadow-blue-500/40"
-                    onClick={() => scrollToSection("scroll_to_explore")}
+                    className="px-8 py-4 rounded-lg font-semibold border-2 transition-all duration-300 bg-white/90 hover:bg-white text-gray-900 border-white/50 shadow-xl"
                   >
                     {button.text}
                   </motion.button>
-                );
-              } else if (button.action === "navigate_to_auth") {
-                return (
-                  <Link key={index} href="/auth" scroll={false}>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-8 py-4 rounded-lg font-semibold border transition-all duration-300 border-border bg-background hover:bg-accent hover:text-accent-foreground"
-                    >
-                      {button.text}
-                    </motion.button>
-                  </Link>
-                );
-              }
-              return null;
-            })}
-          </motion.div>
+                </Link>
+              );
+            }
+            return null;
+          })}
         </motion.div>
       </div>
 
-      {/* Scroll Indicator (omitted for brevity) */}
+      {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -187,38 +177,33 @@ export const HeroSection = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-6 h-10 border-2 rounded-full flex justify-center border-muted-foreground/50"
+          className="w-6 h-10 border-2 rounded-full flex justify-center border-white/70"
         >
           <motion.div
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-1 h-3 rounded-full mt-2 bg-muted-foreground/70"
+            className="w-1 h-3 rounded-full mt-2 bg-white/70"
           />
         </motion.div>
       </motion.div>
     </section>
   );
 };
-// ... rest of the file ... (AboutSection, etc.)
 
 const AboutSection = () => {
   const { content, loading, error } = useContent();
 
-  // Loading state
   if (loading && !content.about) {
     return (
       <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-lg text-muted-foreground">
-            Loading about content...
-          </p>
+          <p className="text-lg text-muted-foreground">Loading about content...</p>
         </div>
       </section>
     );
   }
 
-  // Error state
   if (error && !content.about) {
     return (
       <section className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
@@ -235,12 +220,10 @@ const AboutSection = () => {
     );
   }
 
-  // FIXED: Safely access nested properties with proper null checks
   const aboutData = content.about || {};
   const title = aboutData.title || "Explore I2EDC";
   const subtitle = aboutData.subtitle || "Our Clubs";
   
-  // CRITICAL FIX: Ensure clubs is always an array
   const clubs = Array.isArray(aboutData.clubs) ? aboutData.clubs : [
     {
       title: "Protospace & Tinkering Lab",
@@ -289,14 +272,12 @@ const AboutSection = () => {
     }
   ];
 
-  // Default icons for clubs
   const clubIcons = [
-    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`,
-    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>`,
-    `<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>`
+    `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>`,
+    `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>`,
+    `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>`
   ];
 
-  // Function to render SVG from string
   const renderSVG = (svgString: string) => {
     return <div dangerouslySetInnerHTML={{ __html: svgString }} />;
   };
@@ -306,11 +287,13 @@ const AboutSection = () => {
       className="relative w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900"
       id="explore"
     >
-      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
+      {/* NO VIDEO HERE - Just gradient background */}
+      <div className="relative z-10 text-center px-6 max-w-6xl mx-auto py-20">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
           className="text-4xl md:text-5xl font-bold text-foreground mb-4"
         >
           {title}
@@ -320,12 +303,12 @@ const AboutSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
           className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto"
         >
           {subtitle}
         </motion.p>
 
-        {/* Clubs Section */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {clubs.map((club: any, index: number) => (
             <motion.div
@@ -333,6 +316,7 @@ const AboutSection = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
+              viewport={{ once: true }}
               className="rounded-2xl p-8 border transition-all duration-300 hover:shadow-lg bg-card/80 backdrop-blur-sm border-border hover:border-border/80"
             >
               <div
@@ -347,7 +331,6 @@ const AboutSection = () => {
                 {club.description || ""}
               </p>
               
-              {/* Additional club information */}
               {club.highlights && Array.isArray(club.highlights) && club.highlights.length > 0 && club.highlights[0] && (
                 <div className="text-sm text-muted-foreground text-left">
                   <strong>Highlights:</strong>
@@ -362,11 +345,11 @@ const AboutSection = () => {
           ))}
         </div>
 
-        {/* Activities Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
           className="text-center"
         >
           <h3 className="text-3xl font-bold text-foreground mb-8">Our Activities</h3>
@@ -377,6 +360,7 @@ const AboutSection = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
                 className="rounded-xl p-6 border bg-card/60 backdrop-blur-sm border-border hover:shadow-md transition-all duration-300"
               >
                 <h4 className="text-lg font-semibold text-foreground mb-3">

@@ -13,13 +13,12 @@
     padding-left: 5rem;
     padding-right: 5rem;
     box-sizing: border-box;
-    /* gap: 2rem;  */
 }
 
 .card {
     grid-column-gap: 1.25rem;
     grid-row-gap: 1.25rem;
-    padding: .5rem; /* Increased padding for better touch targets */
+    padding: .5rem;
     background-color: #f0f0f0;
     color: black;
     justify-content: space-between;
@@ -27,8 +26,8 @@
     transition: color .3s, transform .4s;
     display: flex;
     position: relative;
-    flex: 1; /* Added flex property for equal distribution */
-    min-width: 0; /* Prevents flex items from overflowing */
+    flex: 1;
+    min-width: 0;
     font-size: clamp(.3rem, 3vw, 1rem);
 }
 
@@ -38,7 +37,7 @@
     align-items: stretch;
     max-width: 17.375rem;
     display: flex;
-    width: 100%; /* Ensure full width */
+    width: 100%;
 }
 
 .card-image {
@@ -46,8 +45,8 @@
     object-fit: cover;
     max-width: 6rem;
     max-height: 7.5rem;
-    width: 100%; /* Responsive image */
-    height: auto; /* Maintain aspect ratio */
+    width: 100%;
+    height: auto;
 }
 
 .card-overlay {
@@ -59,7 +58,8 @@
     position: absolute;
     inset: auto 0% 0%;
 }
-.text-responsive-heading-1{
+
+.text-responsive-heading-1 {
     font-size: clamp(1.5rem, 5vw, 3rem);
 }
 
@@ -90,11 +90,10 @@
         padding-bottom: 3rem;
         gap: 1.5rem;
     }
-    .card{
+    
+    .card {
         width: 100%;
     }
-    
-    
 }
 
 /* Large mobile devices (481px - 767px) */
@@ -105,8 +104,6 @@
         padding-bottom: 2rem;
         gap: 1.25rem;
     }
-    
-    
 }
 
 /* Mobile devices (320px - 480px) */
@@ -121,7 +118,6 @@
     .card {
         width: 100%;
     }
-    
 }
 
 /* Extra small devices (320px and below) */
@@ -131,21 +127,11 @@
         padding-right: 0.75rem;
         padding-bottom: 1rem;
     }
-    
-    /* .card {
-        padding: 0.75rem;
-    }
-    
-    .card-image {
-        max-width: 4rem;
-        max-height: 5rem;
-    } */
 }
 
 /* High DPI/Retina displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .card-image {
-        /* Ensure images are crisp on high DPI screens */
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
     }

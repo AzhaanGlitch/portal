@@ -1,4 +1,4 @@
-// BackgroundVideo.tsx
+// BackgroundVideo.tsx - Final Fixed Version
 "use client";
 
 import { useRef, useEffect } from "react";
@@ -10,7 +10,7 @@ interface BackgroundVideoProps {
 
 const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   videoPath = "/videos/background.mp4",
-  opacity = 0.5, // Adjusted opacity for better text contrast
+  opacity = 0.5,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -24,22 +24,14 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
   }, []);
 
   return (
-    // FIX: Changed from 'fixed' to 'absolute inset-0 w-full h-full' to cover the parent section.
-    // Removed fixed top/height styles.
     <div 
-      className="absolute inset-0 w-full h-full pointer-events-none" 
-      style={{ 
-        zIndex: 0
-      }}
+      className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden" 
+      style={{ zIndex: 0 }}
     >
       <video
         ref={videoRef}
-        // object-cover ensures the video scales correctly to cover the full container, fixing the "too zoomed" issue.
-        className="w-full h-full object-cover" 
-        style={{ 
-          opacity,
-          // Removed original border radius styles to allow full coverage
-        }}
+        className="w-full h-full object-cover"
+        style={{ opacity }}
         autoPlay
         loop
         muted
@@ -48,8 +40,8 @@ const BackgroundVideo: React.FC<BackgroundVideoProps> = ({
         <source src={videoPath} type="video/mp4" />
       </video>
       
-      {/* Optional: Dark overlay for better text contrast */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      {/* Dark overlay for better text contrast */}
+      <div className="absolute inset-0 bg-black/50"></div>
     </div>
   );
 };
