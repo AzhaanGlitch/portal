@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -154,7 +154,7 @@ const DotMatrix: React.FC<DotMatrixProps> = ({
 
 const ShaderMaterial = ({ source, uniforms, maxFps = 60 }: { source: string; maxFps?: number; uniforms: Uniforms }) => {
   const { size } = useThree();
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = React.useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
@@ -217,7 +217,6 @@ const ShaderMaterial = ({ source, uniforms, maxFps = 60 }: { source: string; max
       blendSrc: THREE.SrcAlphaFactor,
       blendDst: THREE.OneFactor,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size.width, size.height, source]);
 
   return (
@@ -238,13 +237,13 @@ const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
 
 export default function AuthPage() {
   const router = useRouter();
-  const [step, setStep] = useState('email');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
 
@@ -252,47 +251,32 @@ export default function AuthPage() {
     if (typeof window !== 'undefined') {
       const action = new URLSearchParams(window.location.search).get('action');
       setIsSignUp(action === 'signup');
-      if (action === 'signup') {
-        setStep('signup');
-      }
     }
   }, []);
 
-  const handleEmailContinue = () => {
-    if (email) {
-      setStep('signup');
-      setIsSignUp(true);
-    }
-  };
-
   const handleSignIn = async () => {
-    if (!email || !password) {
+    if (!username || !password) {
       toast.error('Please fill in all fields');
       return;
     }
     setLoading(true);
     try {
-      console.log('🔵 Attempting login with:', { email });
-      const response = await api.post('/accounts/login/', { email, password });
-      console.log('✅ Login response:', response);
+      const response = await api.post('/accounts/login/', { username, password });
       
       if (response.status === 200) {
+        if (response.data.access) localStorage.setItem('access_token', response.data.access);
+        if (response.data.refresh) localStorage.setItem('refresh_token', response.data.refresh);
+        
         setReverseCanvasVisible(true);
         setTimeout(() => setInitialCanvasVisible(false), 50);
         setTimeout(() => {
-          setStep('success');
           toast.success('Welcome back!');
-          setTimeout(() => router.push('/'), 2000);
+          window.location.href = '/';
         }, 1500);
       }
     } catch (error: any) {
-      console.error('❌ Login error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error?.response?.data,
-        status: error?.response?.status
-      });
-      toast.error(error?.response?.data?.error || error?.message || 'Sign-in failed. Please check console for details.');
+      console.error('Login error:', error);
+      toast.error(error?.response?.data?.error || error?.message || 'Sign-in failed');
     } finally {
       setLoading(false);
     }
@@ -305,7 +289,6 @@ export default function AuthPage() {
     }
     setLoading(true);
     try {
-      console.log('🔵 Attempting signup with:', { email, firstName, lastName });
       const response = await api.post('/accounts/signup/', {
         username: email,
         email,
@@ -313,7 +296,6 @@ export default function AuthPage() {
         first_name: firstName,
         last_name: lastName,
       });
-      console.log('✅ Signup response:', response);
       
       if (response.status === 200 || response.status === 201) {
         localStorage.setItem('i2dcUsername@#12', response.data?.username || email);
@@ -325,23 +307,10 @@ export default function AuthPage() {
         }, 1500);
       }
     } catch (error: any) {
-      console.error('❌ Signup error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error?.response?.data,
-        status: error?.response?.status
-      });
-      toast.error(error?.response?.data?.error || error?.message || 'Sign-up failed. Please check console for details.');
+      console.error('Signup error:', error);
+      toast.error(error?.response?.data?.error || error?.message || 'Sign-up failed');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleBack = () => {
-    if (step === 'signup') {
-      setStep('email');
-      setIsSignUp(false);
-      router.push('/auth');
     }
   };
 
@@ -381,9 +350,9 @@ export default function AuthPage() {
           <div className="flex-1 flex flex-col justify-center items-center px-4">
             <div className="w-full mt-[150px] max-w-sm">
               <AnimatePresence mode="wait">
-                {step === 'email' ? (
+                {!isSignUp ? (
                   <motion.div
-                    key="email-step"
+                    key="signin"
                     initial={{ opacity: 0, x: -100 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -100 }}
@@ -392,59 +361,57 @@ export default function AuthPage() {
                   >
                     <div className="space-y-1">
                       <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight bg-gradient-to-r from-[#3b82f6] to-[#9333ea] bg-clip-text text-transparent">
-                        Welcome To I2EDC
+                        Welcome to I2EDC
                       </h1>
-                      <p className="text-[1.8rem] text-black/70 font-light">Sign-in to your account</p>
+                      <p className="text-[1.8rem] text-black/70 font-light">Sign in to continue</p>
                     </div>
 
                     <div className="space-y-4">
-                      <button className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-black/5 hover:bg-black/10 text-black border border-black/10 rounded-full py-3 px-4 transition-colors">
-                        <span className="text-lg">G</span>
-                        <span>Sign in with Google</span>
-                      </button>
+                      <input
+                        type="text"
+                        placeholder="Username or Email"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                      />
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSignIn()}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                      />
 
-                      <div className="flex items-center gap-4">
-                        <div className="h-px bg-black/10 flex-1" />
-                        <span className="text-black/40 text-sm">or</span>
-                        <div className="h-px bg-black/10 flex-1" />
-                      </div>
+                      <motion.button
+                        onClick={handleSignIn}
+                        disabled={loading}
+                        className={`w-full rounded-full font-medium py-3 transition-all ${
+                          loading ? 'bg-gray-200 text-black/50 cursor-not-allowed' : 'bg-black text-white hover:bg-black/90'
+                        }`}
+                        whileHover={{ scale: loading ? 1 : 1.02 }}
+                        whileTap={{ scale: loading ? 1 : 0.98 }}
+                      >
+                        {loading ? 'Signing In...' : 'Sign In'}
+                      </motion.button>
 
-                      <div className="relative">
-                        <input
-                          type="email"
-                          placeholder="info@gmail.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleEmailContinue()}
-                          className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
-                        />
+                      <p className="text-sm text-black/50">
+                        Don't have an account?{' '}
                         <button
-                          onClick={handleEmailContinue}
-                          className="absolute right-1.5 top-1.5 text-black w-9 h-9 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/20 transition-colors group overflow-hidden"
+                          onClick={() => {
+                            setIsSignUp(true);
+                            router.push('/auth?action=signup');
+                          }}
+                          className="text-black font-medium underline"
                         >
-                          <span className="relative w-full h-full block overflow-hidden">
-                            <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-full">
-                              →
-                            </span>
-                            <span className="absolute inset-0 flex items-center justify-center transition-transform duration-300 -translate-x-full group-hover:translate-x-0">
-                              →
-                            </span>
-                          </span>
+                          Sign Up
                         </button>
-                      </div>
+                      </p>
                     </div>
-
-                    <p className="text-xs text-black/40 pt-10">
-                      By signing up, you agree to the{' '}
-                      <a href="#" className="underline hover:text-black/60">Product Terms</a>,{' '}
-                      <a href="#" className="underline hover:text-black/60">Policies</a>,{' '}
-                      <a href="#" className="underline hover:text-black/60">Privacy Notice</a>, and{' '}
-                      <a href="#" className="underline hover:text-black/60">Cookie Notice</a>.
-                    </p>
                   </motion.div>
-                ) : step === 'signup' ? (
+                ) : (
                   <motion.div
-                    key="signup-step"
+                    key="signup"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 100 }}
@@ -452,116 +419,68 @@ export default function AuthPage() {
                     className="space-y-6 text-center"
                   >
                     <div className="space-y-1">
-                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-black">
-                        {isSignUp ? 'Complete Your Profile' : 'Enter Your Password'}
+                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight bg-gradient-to-r from-[#3b82f6] to-[#9333ea] bg-clip-text text-transparent">
+                        Create Account
                       </h1>
-                      <p className="text-[1.25rem] text-black/50 font-light">{email}</p>
+                      <p className="text-[1.8rem] text-black/70 font-light">Join us today</p>
                     </div>
 
                     <div className="space-y-4">
-                      {isSignUp && (
-                        <>
-                          <input
-                            type="text"
-                            placeholder="First Name"
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
-                            className="w-full backdrop-blur-[1px] text-black border border-black/10 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Last Name"
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            className="w-full backdrop-blur-[1px] text-black border border-black/10 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
-                          />
-                        </>
-                      )}
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                      />
                       <input
                         type="password"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (isSignUp ? handleSignUp() : handleSignIn())}
-                        className="w-full backdrop-blur-[1px] text-black border border-black/10 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSignUp()}
+                        className="w-full backdrop-blur-[1px] text-black border border-black/30 rounded-full py-3 px-4 focus:outline-none focus:border-black/30 text-center bg-transparent"
                       />
 
-                      <div className="flex w-full gap-3 pt-4">
-                        <motion.button
-                          onClick={handleBack}
-                          className="rounded-full bg-black text-white font-medium px-8 py-3 hover:bg-black/90 transition-colors w-[30%]"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          Back
-                        </motion.button>
-                        <motion.button
-                          onClick={isSignUp ? handleSignUp : handleSignIn}
-                          disabled={loading}
-                          className={`flex-1 rounded-full font-medium py-3 border transition-all duration-300 ${
-                            loading ? 'bg-gray-200 text-black/50 border-black/10 cursor-not-allowed' : 'bg-black text-white border-transparent hover:bg-black/90 cursor-pointer'
-                          }`}
-                        >
-                          {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
-                        </motion.button>
-                      </div>
-                    </div>
+                      <motion.button
+                        onClick={handleSignUp}
+                        disabled={loading}
+                        className={`w-full rounded-full font-medium py-3 transition-all ${
+                          loading ? 'bg-gray-200 text-black/50 cursor-not-allowed' : 'bg-black text-white hover:bg-black/90'
+                        }`}
+                        whileHover={{ scale: loading ? 1 : 1.02 }}
+                        whileTap={{ scale: loading ? 1 : 0.98 }}
+                      >
+                        {loading ? 'Creating Account...' : 'Sign Up'}
+                      </motion.button>
 
-                    <div className="pt-16">
-                      <p className="text-xs text-black/40">
-                        By signing up, you agree to the{' '}
-                        <a href="#" className="underline hover:text-black/60">Product Terms</a>,{' '}
-                        <a href="#" className="underline hover:text-black/60">Policies</a>,{' '}
-                        <a href="#" className="underline hover:text-black/60">Privacy Notice</a>, and{' '}
-                        <a href="#" className="underline hover:text-black/60">Cookie Notice</a>.
+                      <p className="text-sm text-black/50">
+                        Already have an account?{' '}
+                        <button
+                          onClick={() => {
+                            setIsSignUp(false);
+                            router.push('/auth');
+                          }}
+                          className="text-black font-medium underline"
+                        >
+                          Sign In
+                        </button>
                       </p>
                     </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="success-step"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: 'easeOut', delay: 0.3 }}
-                    className="space-y-6 text-center"
-                  >
-                    <div className="space-y-1">
-                      <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-black">
-                        You're in!
-                      </h1>
-                      <p className="text-[1.25rem] text-black/50 font-light">Welcome</p>
-                    </div>
-
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, delay: 0.5 }}
-                      className="py-10"
-                    >
-                      <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-black to-black/70 flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-8 w-8 text-white"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    </motion.div>
-
-                    <motion.button
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1 }}
-                      className="w-full rounded-full bg-black text-white font-medium py-3 hover:bg-black/90 transition-colors"
-                    >
-                      Continue to Dashboard
-                    </motion.button>
                   </motion.div>
                 )}
               </AnimatePresence>
